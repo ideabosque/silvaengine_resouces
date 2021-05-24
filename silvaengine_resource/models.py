@@ -25,8 +25,6 @@ class BaseModel(Model):
         billing_mode = "PAY_PER_REQUEST"
         region = os.getenv("REGIONNAME")
 
-        print(region)
-
         if not region:
             from dotenv import load_dotenv
 
@@ -35,8 +33,6 @@ class BaseModel(Model):
             region = os.getenv("region_name")
             aws_access_key_id = os.getenv("aws_access_key_id")
             aws_secret_access_key = os.getenv("aws_secret_access_key")
-
-            print(os.getenv("region_name"), os.getenv("aws_access_key_id"))
 
 
 class ResourceModel(BaseModel):
