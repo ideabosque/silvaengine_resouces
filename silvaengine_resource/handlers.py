@@ -11,7 +11,6 @@ import uuid
 
 
 def _add_resource_handler(packages):
-    print("debug")
     statements = []
     # Insert a resource record.
     updated_by = "setup"
@@ -29,7 +28,6 @@ def _add_resource_handler(packages):
 
     # Insert resource / function / config data.
     for package in packages:
-        print("Load package:", package)
         # 1. Load module by dynamic
         spec = find_spec(package)
 
@@ -45,7 +43,7 @@ def _add_resource_handler(packages):
 
         if type(profiles) is not list or len(profiles) < 1:
             continue
-        print("debug", profiles)
+
         # 2. Insert resource / function.
         for profile in profiles:
             if not profile.get("class"):
@@ -62,7 +60,6 @@ def _add_resource_handler(packages):
                 )
                 # TODO: Get region / IAM Number from env.
                 aws_lambda_arn = "arn:aws:lambda:us-west-2:305624596524:function:silvaengine_microcore"
-                print("Resoruce ID:", factor)
                 resouce_id = md5(factor.encode(encoding="UTF-8")).hexdigest()
                 # Add new resource to table
                 statements.append(
@@ -86,8 +83,6 @@ def _add_resource_handler(packages):
                         # "condition": ResourceModel.resource_id != resouce_id,
                     }
                 )
-
-                print("adsadfasdfasdfasfsadf")
 
                 # Add new function to table
                 statements.append(
@@ -156,7 +151,7 @@ def _add_resource_handler(packages):
                     )
                 }
             )
-    print(statements)
+
     # Insert by batch
     connection = Connection(region=ResourceModel.Meta.region)
     client_request_token = uuid.uuid1().hex
