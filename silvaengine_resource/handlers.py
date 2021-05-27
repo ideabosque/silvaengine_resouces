@@ -153,11 +153,10 @@ def _add_resource_handler(packages):
             )
 
     # Insert by batch
-    connection = Connection(region=ResourceModel.Meta.region)
-    client_request_token = uuid.uuid1().hex
-
+    # @TODO: If statements total more than 25, should use batchWrite to replace.
     with TransactWrite(
-        connection=connection, client_request_token=client_request_token
+        connection=Connection(region=ResourceModel.Meta.region),
+        client_request_token=uuid.uuid1().hex,
     ) as transaction:
         for item in statements:
             if item.get("condition"):
