@@ -36,10 +36,10 @@ def _add_resource_handler(packages):
 
         module = import_module(package)
 
-        if not hasattr(module, "profile"):
+        if not hasattr(module, "deploy"):
             continue
 
-        profiles = getattr(module, "profile")()
+        profiles = getattr(module, "deploy")()
 
         if type(profiles) is not list or len(profiles) < 1:
             continue
