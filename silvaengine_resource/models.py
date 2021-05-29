@@ -84,10 +84,10 @@ class ConnectionsModel(BaseModel):
 
 
 class OperationMap(MapAttribute):
-    create = ListAttribute(of=UnicodeAttribute)
-    query = ListAttribute(of=UnicodeAttribute)
-    update = ListAttribute(of=UnicodeAttribute)
-    delete = ListAttribute(of=UnicodeAttribute)
+    create = ListAttribute()
+    query = ListAttribute()
+    update = ListAttribute()
+    delete = ListAttribute()
 
 
 class ConfigMap(MapAttribute):
