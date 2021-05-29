@@ -92,7 +92,7 @@ class OperationMap(MapAttribute):
 
 class ConfigMap(MapAttribute):
     class_name = UnicodeAttribute()
-    function_type = UnicodeAttribute()
+    funct_type = UnicodeAttribute()
     methods = ListAttribute()
     module_name = UnicodeAttribute()
     setting = UnicodeAttribute()
