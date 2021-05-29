@@ -94,13 +94,13 @@ def _add_resource_handler(packages):
                                 "area": area,
                                 "config": {
                                     "class_name": profile.get("class"),
-                                    "function_type": config.get("type")
+                                    "funct_type": config.get("type")
                                     if config.get("type")
                                     else "RequestResponse",
                                     "methods": config.get("support_methods")
                                     if type(config.get("support_methods")) is list
                                     and len(config.get("support_methods"))
-                                    else ["post", "get"],
+                                    else ["POST", "GET"],
                                     "module_name": package,
                                     "setting": config.get("settings")
                                     if config.get("settings")
@@ -112,7 +112,7 @@ def _add_resource_handler(packages):
                                     else False,
                                     "graphql": bool(config.get("is_graphql"))
                                     if config.get("is_graphql")
-                                    else True,
+                                    else False,
                                     "operations": {
                                         "create": config.get("create")
                                         if type(config.get("create")) is list
