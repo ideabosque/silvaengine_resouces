@@ -52,20 +52,19 @@ def _add_resource_handler(packages):
             for function_name, config in profile.get("functions").items():
                 function_name = function_name.lower().strip()
                 # Factor of generate resource ID
-                factor = "{}-{}-{}-{}".format(
-                    profile.get("service"),
-                    package,
-                    profile.get("class"),
+                factor = "{}-{}-{}".format(
+                    package.strip(),
+                    profile.get("class").strip(),
                     function_name,
-                )
+                ).lower()
                 # TODO: Get region / IAM Number from env.
                 aws_lambda_arn = "arn:aws:lambda:us-west-2:305624596524:function:silvaengine_microcore"
-                resouce_id = md5(factor.encode(encoding="UTF-8")).hexdigest()
+                resource_id = md5(factor.encode(encoding="UTF-8")).hexdigest()
                 # Add new resource to table
                 statements.append(
                     {
                         "statement": ResourceModel(
-                            resouce_id,
+                            resource_id,
                             profile.get("service"),
                             **{
                                 "module_name": package,
@@ -80,7 +79,7 @@ def _add_resource_handler(packages):
                                 "updated_by": updated_by,
                             }
                         ),
-                        # "condition": ResourceModel.resource_id != resouce_id,
+                        # "condition": ResourceModel.resource_id != resource_id,
                     }
                 )
 
@@ -104,7 +103,7 @@ def _add_resource_handler(packages):
                                     "module_name": package,
                                     "setting": config.get("settings")
                                     if config.get("settings")
-                                    else "",
+                                    else package,
                                     "auth_required": bool(
                                         config.get("is_auth_required")
                                     )
