@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
-__author__ = "bibow"
+__author__ = "bl"
 
 import os
 from pynamodb.models import Model
@@ -35,6 +35,18 @@ class BaseModel(Model):
             aws_secret_access_key = os.getenv("aws_secret_access_key")
 
 
+class ResourceOperationItemMap(MapAttribute):
+    label = UnicodeAttribute()
+    action = UnicodeAttribute()
+
+
+class ResourceOperationMap(MapAttribute):
+    create = ListAttribute(of=ResourceOperationItemMap)
+    query = ListAttribute(of=ResourceOperationItemMap)
+    update = ListAttribute(of=ResourceOperationItemMap)
+    delete = ListAttribute(of=ResourceOperationItemMap)
+
+
 class ResourceModel(BaseModel):
     class Meta(BaseModel.Meta):
         table_name = "se-resources"
@@ -46,6 +58,7 @@ class ResourceModel(BaseModel):
     function = UnicodeAttribute()
     label = UnicodeAttribute()
     status = NumberAttribute()
+    operations = ResourceOperationMap()
     created_at = UTCDateTimeAttribute()
     updated_at = UTCDateTimeAttribute()
     updated_by = UnicodeAttribute()

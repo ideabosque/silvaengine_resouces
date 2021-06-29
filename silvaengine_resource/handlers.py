@@ -1,5 +1,10 @@
-from pynamodb.expressions.condition import Condition
-from .models import ResourceModel, FunctionsModel, ConfigDataModel, Status
+from .models import (
+    ResourceModel,
+    FunctionsModel,
+    ConfigDataModel,
+    Status,
+)
+from silvaengine_utility import Utility
 from pynamodb.connection import Connection
 from pynamodb.transactions import TransactWrite
 from pynamodb.exceptions import TransactWriteError
@@ -7,10 +12,21 @@ from datetime import datetime
 from importlib.util import find_spec
 from importlib import import_module
 from hashlib import md5
+import boto3
 import uuid
 
 
 def _add_resource_handler(packages):
+    identity = boto3.client(
+        "sts",
+        region_name=ResourceModel.Meta.region,
+        aws_access_key_id=ResourceModel.Meta.aws_access_key_id,
+        aws_secret_access_key=ResourceModel.Meta.aws_secret_access_key,
+    ).get_caller_identity()
+
+    if identity.get("Account") is None:
+        return
+
     statements = []
     # Insert a resource record.
     updated_by = "setup"
@@ -25,6 +41,38 @@ def _add_resource_handler(packages):
         "aws_access_key_id": ResourceModel.Meta.aws_access_key_id,
         "aws_secret_access_key": ResourceModel.Meta.aws_secret_access_key,
     }
+    # TODO: Get region / IAM Number from env.
+    aws_lambda_arn = "arn:aws:lambda:{}:{}:function:silvaengine_microcore".format(
+        ResourceModel.Meta.region, identity.get("Account")
+    )
+    now = datetime.utcnow()
+
+    print("Resource settings:", settings)
+    print("Resource packages:", packages)
+
+    def getOperations(payload, returnMap=False) -> list:
+        operations = []
+
+        if payload is not None:
+            attributes = ["label", "action"] if returnMap else ["action"]
+            al = len(attributes)
+
+            for item in payload:
+                if al == 1:
+                    for k in item.keys():
+                        if k in attributes:
+                            operations.append(item[k])
+                else:
+                    pairs = {}
+
+                    for k in item.keys():
+                        if k in attributes:
+                            pairs[k] = item[k]
+
+                    if len(pairs.keys()) == al:
+                        operations.append(pairs)
+
+        return operations
 
     # Insert resource / function / config data.
     for package in packages:
@@ -57,10 +105,8 @@ def _add_resource_handler(packages):
                     profile.get("class").strip(),
                     function_name,
                 ).lower()
-                # TODO: Get region / IAM Number from env.
-                aws_lambda_arn = "arn:aws:lambda:us-west-2:305624596524:function:silvaengine_microcore"
                 resource_id = md5(factor.encode(encoding="UTF-8")).hexdigest()
-                # Add new resource to table
+                # Add new resource to table se-resource
                 statements.append(
                     {
                         "statement": ResourceModel(
@@ -74,8 +120,14 @@ def _add_resource_handler(packages):
                                 if config.get("label")
                                 else "",
                                 "status": Status.enabled,
-                                "created_at": datetime.utcnow(),
-                                "updated_at": datetime.utcnow(),
+                                "operations": {
+                                    "create": getOperations(config.get("create"), True),
+                                    "query": getOperations(config.get("query"), True),
+                                    "update": getOperations(config.get("update"), True),
+                                    "delete": getOperations(config.get("delete"), True),
+                                },
+                                "created_at": now,
+                                "updated_at": now,
                                 "updated_by": updated_by,
                             }
                         ),
@@ -83,7 +135,7 @@ def _add_resource_handler(packages):
                     }
                 )
 
-                # Add new function to table
+                # Add new function to table se-functions
                 statements.append(
                     {
                         "statement": FunctionsModel(
@@ -113,22 +165,10 @@ def _add_resource_handler(packages):
                                     if config.get("is_graphql")
                                     else False,
                                     "operations": {
-                                        "create": config.get("create")
-                                        if type(config.get("create")) is list
-                                        and len(config.get("create"))
-                                        else [],
-                                        "query": config.get("query")
-                                        if type(config.get("query")) is list
-                                        and len(config.get("query"))
-                                        else [],
-                                        "update": config.get("update")
-                                        if type(config.get("update")) is list
-                                        and len(config.get("update"))
-                                        else [],
-                                        "delete": config.get("delete")
-                                        if type(config.get("delete")) is list
-                                        and len(config.get("delete"))
-                                        else [],
+                                        "create": getOperations(config.get("create")),
+                                        "query": getOperations(config.get("query")),
+                                        "update": getOperations(config.get("update")),
+                                        "delete": getOperations(config.get("delete")),
                                     },
                                 },
                             }
@@ -152,15 +192,25 @@ def _add_resource_handler(packages):
             )
 
     # Insert by batch
-    # @TODO: If statements total more than 25, should use batchWrite to replace.
-    with TransactWrite(
-        connection=Connection(region=ResourceModel.Meta.region),
-        client_request_token=uuid.uuid1().hex,
-    ) as transaction:
+    if len(statements):
+        # @TODO: If statements total more than 25, should use batchWrite to replace.
+        # with TransactWrite(
+        #     connection=Connection(region=ResourceModel.Meta.region),
+        #     client_request_token=uuid.uuid1().hex,
+        # ) as transaction:
         for item in statements:
-            if item.get("condition"):
-                transaction.save(
-                    item.get("statement"), condition=(item.get("condition"))
-                )
-            else:
-                transaction.save(item.get("statement"))
+            if not item.get("statement"):
+                continue
+
+            item.get("statement").save()
+
+            # if item.get("condition"):
+            #     transaction.save(
+            #         item.get("statement"), condition=(item.get("condition"))
+            #     )
+            # else:
+            #     transaction.save(item.get("statement"))
+
+            print("Completed:", item.get("statement"))
+
+    print("Done")
