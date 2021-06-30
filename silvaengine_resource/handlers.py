@@ -18,12 +18,6 @@ import boto3
 
 
 def _add_resource_handler(packages):
-    print(
-        "Resource settings:",
-        ResourceModel.Meta.region,
-        ResourceModel.Meta.aws_access_key_id,
-        ResourceModel.Meta.aws_secret_access_key,
-    )
     identity = boto3.client(
         "sts",
         region_name=ResourceModel.Meta.region,
@@ -54,8 +48,6 @@ def _add_resource_handler(packages):
     )
     now = datetime.utcnow()
 
-    print(settings, aws_lambda_arn)
-
     def getOperations(payload, returnMap=False) -> list:
         operations = []
 
@@ -64,7 +56,6 @@ def _add_resource_handler(packages):
             al = len(attributes)
 
             for item in payload:
-                print(type(item), item)
                 if al == 1:
                     for k in item.keys():
                         if k in attributes:
