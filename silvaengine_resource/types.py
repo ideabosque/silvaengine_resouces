@@ -4,13 +4,19 @@ from __future__ import print_function
 
 __author__ = "bl"
 
-from graphene import (
-    ObjectType,
-    InputObjectType,
-    String,
-    DateTime,
-    Int,
-)
+from graphene import ObjectType, InputObjectType, String, DateTime, Int, List, Field
+
+
+class ResourceOperationItemMap(ObjectType):
+    label = String()
+    action = String()
+
+
+class ResourceOperationMap(ObjectType):
+    create = List(ResourceOperationItemMap)
+    query = List(ResourceOperationItemMap)
+    update = List(ResourceOperationItemMap)
+    delete = List(ResourceOperationItemMap)
 
 
 class ResourceType(ObjectType):
@@ -19,6 +25,7 @@ class ResourceType(ObjectType):
     module_name = String()
     class_name = String()
     function = String()
+    operations = Field(ResourceOperationMap)
     label = String()
     status = Int()
     created_at = DateTime()
