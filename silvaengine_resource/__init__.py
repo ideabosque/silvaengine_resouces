@@ -3,4 +3,4 @@
 __author__ = "bl"
 
 __all__ = ["main", "models", "handlers", "queries", "schema", "types"]
-from .main import Resource
+from .main import Resource, deploy
