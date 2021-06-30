@@ -9,6 +9,31 @@ from silvaengine_utility import Utility
 from .handlers import _add_resource_handler
 from .schema import Query, type_class
 
+# Hook function applied to deployment
+def deploy() -> list:
+    return [
+        {
+            "service": "resources",
+            "class": "Resource",
+            "functions": {
+                "resource_graphql": {
+                    "is_static": False,
+                    "label": "Resource",
+                    "query": [
+                        {
+                            "action": "resources",
+                            "label": "Query Resources",
+                        },
+                    ],
+                    "type": "RequestResponse",
+                    "support_methods": ["POST"],
+                    "is_auth_required": False,
+                    "is_graphql": True,
+                }
+            },
+        }
+    ]
+
 
 class Resource(object):
     def __init__(self, logger, **setting):
@@ -24,7 +49,6 @@ class Resource(object):
             query=Query,
             types=type_class(),
         )
-
         ctx = {"logger": self.logger}
         variables = params.get("variables", {})
         query = params.get("query")
