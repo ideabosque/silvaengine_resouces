@@ -34,7 +34,17 @@ class SilvaEngineResourceTest(unittest.TestCase):
 
     # @unittest.skip("demonstrating skipping")
     def test_add_resource(self):
-        logger.info(self.resource.add_resource(["analytics_engine"]))
+        logger.info(
+            self.resource.add_resource(
+                [
+                    "analytics_engine",
+                    "user_engine",
+                    "shipping_quote_engine",
+                    "seller_engine",
+                    "factory_engine",
+                ]
+            )
+        )
 
     @unittest.skip("demonstrating skipping")
     def test_graphql_get_resource(self):

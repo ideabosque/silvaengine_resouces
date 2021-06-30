@@ -17,6 +17,7 @@ import uuid
 
 
 def _add_resource_handler(packages):
+    print("Debug 111")
     identity = boto3.client(
         "sts",
         region_name=ResourceModel.Meta.region,
@@ -47,8 +48,7 @@ def _add_resource_handler(packages):
     )
     now = datetime.utcnow()
 
-    print("Resource settings:", settings)
-    print("Resource packages:", packages)
+    print("Debug 222:", settings)
 
     def getOperations(payload, returnMap=False) -> list:
         operations = []
@@ -76,18 +76,26 @@ def _add_resource_handler(packages):
 
     # Insert resource / function / config data.
     for package in packages:
+        print("Debug 333:", package)
         # 1. Load module by dynamic
         spec = find_spec(package)
 
+        print("Debug 555:", package, spec)
         if spec is None:
             continue
 
         module = import_module(package)
 
+        print("Debug 666:", module)
+
         if not hasattr(module, "deploy"):
             continue
 
+        print("Debug 777:")
+
         profiles = getattr(module, "deploy")()
+
+        print("Debug 888:", profiles)
 
         if type(profiles) is not list or len(profiles) < 1:
             continue
@@ -190,7 +198,7 @@ def _add_resource_handler(packages):
                     )
                 }
             )
-
+    print("Debug end")
     # Insert by batch
     if len(statements):
         # @TODO: If statements total more than 25, should use batchWrite to replace.
