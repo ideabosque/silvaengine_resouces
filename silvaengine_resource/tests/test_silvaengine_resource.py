@@ -32,7 +32,7 @@ class SilvaEngineResourceTest(unittest.TestCase):
     def tearDown(self):
         logger.info("Destory SilvaEngineResourceTest ...")
 
-    @unittest.skip("demonstrating skipping")
+    # @unittest.skip("demonstrating skipping")
     def test_add_resource(self):
         logger.info(
             self.resource.add_resource(
@@ -46,7 +46,7 @@ class SilvaEngineResourceTest(unittest.TestCase):
             )
         )
 
-    # @unittest.skip("demonstrating skipping")
+    @unittest.skip("demonstrating skipping")
     def test_graphql_get_resource(self):
         # query = """
         #     query resources(

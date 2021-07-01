@@ -36,7 +36,7 @@ def resolve_resources(info, **kwargs):
             **Utility.json_loads(
                 Utility.json_dumps(
                     dict(
-                        # {"last_evaluated_key": Utility.json_dumps(last_evaluated_key)},
+                        {"last_evaluated_key": Utility.json_dumps(last_evaluated_key)},
                         **resource.__dict__["attribute_values"]
                     )
                 )

@@ -2,6 +2,7 @@ from .models import (
     ResourceModel,
     FunctionsModel,
     ConfigDataModel,
+    ConnectionsModel,
     Status,
 )
 from silvaengine_utility import Utility
@@ -30,10 +31,10 @@ def _add_resource_handler(packages):
 
     statements = []
     # Insert a resource record.
-    updated_by = "setup"
+    # updated_by = "setup"
     # Deploy area
-    area = "core"
-    endpoint_id = "api"
+    area = ResourceModel.Meta.aws_api_area
+    endpoint_id = ResourceModel.Meta.aws_endpoint_id
     # @TODO: If the current module which is installing shoud be attach some custom settting item, we need to support them.
     settings = {
         "region_name": ResourceModel.Meta.region,
@@ -126,7 +127,7 @@ def _add_resource_handler(packages):
                                 },
                                 "created_at": now,
                                 "updated_at": now,
-                                "updated_by": updated_by,
+                                # "updated_by": updated_by,
                             }
                         ),
                         # "condition": ResourceModel.resource_id != resource_id,
@@ -174,6 +175,8 @@ def _add_resource_handler(packages):
                         # "condition": FunctionsModel.function.does_not_exist(),
                     }
                 )
+
+                # @TODO: Add function setting to se-connections
 
         # Insert settings for module.
         for key, value in settings.items():

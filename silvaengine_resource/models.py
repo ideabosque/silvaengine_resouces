@@ -26,6 +26,8 @@ class BaseModel(Model):
         region = os.getenv("REGIONNAME")
         aws_access_key_id = os.getenv("aws_access_key_id")
         aws_secret_access_key = os.getenv("aws_secret_access_key")
+        aws_api_area = os.getenv("aws_api_area", "core")
+        aws_endpoint_id = os.getenv("aws_endpoint_id", "api")
 
         if region is None or aws_access_key_id is None or aws_secret_access_key is None:
             from dotenv import load_dotenv
@@ -67,7 +69,7 @@ class ResourceModel(BaseModel):
     operations = ResourceOperationMap()
     created_at = UTCDateTimeAttribute()
     updated_at = UTCDateTimeAttribute()
-    updated_by = UnicodeAttribute()
+    updated_by = UnicodeAttribute(default="Setup")
 
 
 class ConfigDataModel(BaseModel):
@@ -97,8 +99,8 @@ class ConnectionsModel(BaseModel):
     class Meta(BaseModel.Meta):
         table_name = "se-connections"
 
-    api_key = UnicodeAttribute(hash_key=True)
-    endpoint_id = UnicodeAttribute(range_key=True, default="#####")
+    endpoint_id = UnicodeAttribute(hash_key=True)
+    api_key = UnicodeAttribute(range_key=True, default="#####")
     functions = ListAttribute(of=FunctionMap)
 
 
