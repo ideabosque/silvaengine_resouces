@@ -32,7 +32,7 @@ class SilvaEngineResourceTest(unittest.TestCase):
     def tearDown(self):
         logger.info("Destory SilvaEngineResourceTest ...")
 
-    # @unittest.skip("demonstrating skipping")
+    @unittest.skip("demonstrating skipping")
     def test_add_resource(self):
         logger.info(
             self.resource.add_resource(
@@ -46,7 +46,7 @@ class SilvaEngineResourceTest(unittest.TestCase):
             )
         )
 
-    @unittest.skip("demonstrating skipping")
+    # @unittest.skip("demonstrating skipping")
     def test_graphql_get_resource(self):
         # query = """
         #     query resources(
@@ -71,59 +71,59 @@ class SilvaEngineResourceTest(unittest.TestCase):
         #     }
         # # """
 
-        # variables = {"limit": 2}
+        variables = {"limit": 2}
 
         query = """
-            query resources(
-                    $limit: Int!,
-                    $lastEvaluatedKey: String
-                ){
-                resources(
-                    limit: $limit,
-                    lastEvaluatedKey: $lastEvaluatedKey
-                ){
-                    resourceId
-                    service
-                    moduleName,
-                    className,
-                    function,
-                    operations {
-                        create {
-                            label
-                            action
+            query resources($limit: Int!, $lastEvaluatedKey: String) {
+                resources(limit: $limit, lastEvaluatedKey: $lastEvaluatedKey) {
+                    items {
+                        resourceId
+                        service
+                        moduleName
+                        className
+                        function
+                        label
+                        status
+                        createdAt
+                        updatedAt
+                        updatedBy
+                        operations {
+                            create {
+                                label
+                                action
+                            }
+                            query {
+                                label
+                                action
+                            }
+                            update {
+                                label
+                                action
+                            }
+                            delete {
+                                label
+                                action
+                            }
                         }
-                        query {
-                            label
-                            action
-                        }
-                        update {
-                            label
-                            action
-                        }
-                        delete {
-                            label
-                            action
-                        }
-                    },
-                    label,
-                    status
-                    createdAt
-                    updatedAt
-                    updatedBy
-                    lastEvaluatedKey
+                    }
+                    lastEvaluatedKey {
+                        hashKey
+                        rangeKey
+                    }
                 }
             }
+
         """
 
-        variables = {
-            "limit": 1,
-            "lastEvaluatedKey": Utility.json_dumps(
-                {
-                    "service": {"S": "subscription_management"},
-                    "resource_id": {"S": "053429072013b1fc6eeac9555cd4618b"},
-                }
-            ),
-        }
+        # variables = {
+        #     "limit": 1,
+        #     "lastEvaluatedKey": Utility.json_dumps(
+        #         {
+        #             "service": {"S": "subscription_management"},
+        #             "resource_id": {"S": "053429072013b1fc6eeac9555cd4618b"},
+        #         }
+        #     ),
+        # }
 
         payload = {"query": query, "variables": variables}
         response = self.resource.resource_graphql(**payload)

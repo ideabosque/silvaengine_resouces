@@ -2,23 +2,23 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
+from graphene.types.field import Field
+
 __author__ = "bl"
 
 from graphene import ObjectType, String, Int, List, Schema
-from .types import (
-    ResourceType,
-)
+from .types import ResourcesType
 from .queries import resolve_resources
 
 
 def type_class():
-    return [ResourceType]
+    return [ResourcesType]
 
 
 # Query resource or role list
 class Query(ObjectType):
-    resources = List(
-        ResourceType,
+    resources = Field(
+        ResourcesType,
         limit=Int(),
         last_evaluated_key=String(),
         resource_id=String(),

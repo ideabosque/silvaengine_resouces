@@ -1,5 +1,5 @@
 from silvaengine_utility import Utility
-from .types import ResourceType
+from .types import ResourceType, ResourcesType, LastEvaluatedKey
 from .models import ResourceModel
 
 
@@ -29,18 +29,19 @@ def resolve_resources(info, **kwargs):
         results = ResourceModel.scan(limit=int(limit))
 
     resources = [resource for resource in results]
-    last_evaluated_key = results.last_evaluated_key
+    # last_evaluated_key = results.last_evaluated_key
 
-    return [
-        ResourceType(
-            **Utility.json_loads(
-                Utility.json_dumps(
-                    dict(
-                        {"last_evaluated_key": Utility.json_dumps(last_evaluated_key)},
-                        **resource.__dict__["attribute_values"]
-                    )
+    return ResourcesType(
+        items=[
+            ResourceType(
+                **Utility.json_loads(
+                    Utility.json_dumps(dict(**resource.__dict__["attribute_values"]))
                 )
             )
-        )
-        for resource in resources
-    ]
+            for resource in resources
+        ],
+        last_evaluated_key=LastEvaluatedKey(
+            hash_key=results.last_evaluated_key.get("resource_id").get("S"),
+            range_key=results.last_evaluated_key.get("service").get("S"),
+        ),
+    )

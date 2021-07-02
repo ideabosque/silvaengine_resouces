@@ -19,6 +19,11 @@ class ResourceOperationMap(ObjectType):
     delete = List(ResourceOperationItemMap)
 
 
+class ResourceLastEvaluatedKey(ObjectType):
+    resource_id = String()  # se-resource hash-key
+    service = String()  # se-resource range-key
+
+
 class ResourceType(ObjectType):
     resource_id = String()
     service = String()
@@ -31,7 +36,16 @@ class ResourceType(ObjectType):
     created_at = DateTime()
     updated_at = DateTime()
     updated_by = String()
-    last_evaluated_key = String()
+
+
+class LastEvaluatedKey(ObjectType):
+    hash_key = String()
+    range_key = String()
+
+
+class ResourcesType(ObjectType):
+    items = List(ResourceType)
+    last_evaluated_key = Field(LastEvaluatedKey)
 
 
 class ResourceInputType(InputObjectType):
