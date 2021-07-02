@@ -21,9 +21,23 @@ def resolve_resources(info, **kwargs):
         ]
 
     if last_evaluated_key is not None:
+        values = {}
+
+        for k, v in last_evaluated_key.items():
+            key = k.lower()
+
+            if key == "hash_key" and ResourceModel._hash_keyname is not None:
+                values[ResourceModel._hash_keyname] = {
+                    ResourceModel._hash_key_attribute().attr_type[0].upper(): v
+                }
+            elif key == "range_key" and ResourceModel._range_keyname is not None:
+                values[ResourceModel._range_keyname] = {
+                    ResourceModel._range_key_attribute().attr_type[0].upper(): v
+                }
+
         results = ResourceModel.scan(
             limit=int(limit),
-            last_evaluated_key=Utility.json_loads(last_evaluated_key),
+            last_evaluated_key=values,
         )
     else:
         results = ResourceModel.scan(limit=int(limit))

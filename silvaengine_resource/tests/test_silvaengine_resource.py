@@ -71,10 +71,16 @@ class SilvaEngineResourceTest(unittest.TestCase):
         #     }
         # # """
 
-        variables = {"limit": 2}
+        variables = {
+            "limit": 1,
+            "lastEvaluatedKey": {
+                "hashKey": "053429072013b1fc6eeac9555cd4618b",
+                "rangeKey": "subscription_management",
+            },
+        }
 
         query = """
-            query resources($limit: Int!, $lastEvaluatedKey: String) {
+            query resources($limit: Int!, $lastEvaluatedKey: PageInputType) {
                 resources(limit: $limit, lastEvaluatedKey: $lastEvaluatedKey) {
                     items {
                         resourceId
