@@ -6,8 +6,8 @@ from graphene.types.field import Field
 
 __author__ = "bl"
 
-from graphene import ObjectType, String, Int, List, Schema
-from .types import ResourcesType
+from graphene import ObjectType, String, Int, Schema
+from .types import ResourcesType, PageInputType
 from .queries import resolve_resources
 
 
@@ -20,7 +20,7 @@ class Query(ObjectType):
     resources = Field(
         ResourcesType,
         limit=Int(),
-        last_evaluated_key=String(),
+        last_evaluated_key=PageInputType(),
         resource_id=String(),
     )
 
