@@ -72,10 +72,10 @@ class SilvaEngineResourceTest(unittest.TestCase):
         # # """
 
         variables = {
-            "limit": 1,
+            "limit": 10,
             "lastEvaluatedKey": {
-                "hashKey": "053429072013b1fc6eeac9555cd4618b",
-                "rangeKey": "subscription_management",
+                "hashKey": "832be4700056ff454e4129f954c8c1f7",
+                "rangeKey": "analytics",
             },
         }
 
