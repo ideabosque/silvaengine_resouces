@@ -102,6 +102,7 @@ class ConnectionsModel(BaseModel):
     endpoint_id = UnicodeAttribute(hash_key=True)
     api_key = UnicodeAttribute(range_key=True, default="#####")
     functions = ListAttribute(of=FunctionMap)
+    whitelist = ListAttribute()
 
 
 class OperationMap(MapAttribute):

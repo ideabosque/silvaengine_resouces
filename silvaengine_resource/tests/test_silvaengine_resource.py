@@ -75,7 +75,7 @@ class SilvaEngineResourceTest(unittest.TestCase):
             "limit": 10,
             "lastEvaluatedKey": {
                 "hashKey": "832be4700056ff454e4129f954c8c1f7",
-                "rangeKey": "analytics",
+                "rangeKey": "analytics ",
             },
         }
 
