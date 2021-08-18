@@ -36,13 +36,13 @@ def _add_resource_handler(packages):
     area = ResourceModel.Meta.aws_api_area
     endpoint_id = ResourceModel.Meta.aws_endpoint_id
     # @TODO: If the current module which is installing shoud be attach some custom settting item, we need to support them.
-    settings = {
-        "region_name": ResourceModel.Meta.region,
-        "area": area,
-        "endpoint_id": endpoint_id,
-        "aws_access_key_id": ResourceModel.Meta.aws_access_key_id,
-        "aws_secret_access_key": ResourceModel.Meta.aws_secret_access_key,
-    }
+    # settings = {
+    #     "region_name": ResourceModel.Meta.region,
+    #     "area": area,
+    #     "endpoint_id": endpoint_id,
+    #     "aws_access_key_id": ResourceModel.Meta.aws_access_key_id,
+    #     "aws_secret_access_key": ResourceModel.Meta.aws_secret_access_key,
+    # }
     # TODO: Get region / IAM Number from env.
     aws_lambda_arn = "arn:aws:lambda:{}:{}:function:silvaengine_microcore".format(
         ResourceModel.Meta.region, identity.get("Account")
@@ -133,7 +133,7 @@ def _add_resource_handler(packages):
                         # "condition": ResourceModel.resource_id != resource_id,
                     }
                 )
-
+                print(config)
                 # Add new function to table se-functions
                 statements.append(
                     {
@@ -179,18 +179,18 @@ def _add_resource_handler(packages):
                 # @TODO: Add function setting to se-connections
 
         # Insert settings for module.
-        for key, value in settings.items():
-            statements.append(
-                {
-                    "statement": ConfigDataModel(
-                        package,
-                        key,
-                        **{
-                            "value": value,
-                        }
-                    )
-                }
-            )
+        # for key, value in settings.items():
+        #     statements.append(
+        #         {
+        #             "statement": ConfigDataModel(
+        #                 package,
+        #                 key,
+        #                 **{
+        #                     "value": value,
+        #                 }
+        #             )
+        #         }
+        #     )
 
     # Insert by batch
     if len(statements):
