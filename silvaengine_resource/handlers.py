@@ -133,7 +133,7 @@ def _add_resource_handler(packages):
                         # "condition": ResourceModel.resource_id != resource_id,
                     }
                 )
-                print(config)
+
                 # Add new function to table se-functions
                 statements.append(
                     {
