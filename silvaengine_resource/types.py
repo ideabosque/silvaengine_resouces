@@ -13,10 +13,11 @@ class ResourceOperationItemMap(ObjectType):
 
 
 class ResourceOperationMap(ObjectType):
-    create = List(ResourceOperationItemMap)
+    # create = List(ResourceOperationItemMap)
     query = List(ResourceOperationItemMap)
-    update = List(ResourceOperationItemMap)
-    delete = List(ResourceOperationItemMap)
+    mutation = List(ResourceOperationItemMap)
+    # update = List(ResourceOperationItemMap)
+    # delete = List(ResourceOperationItemMap)
 
 
 class ResourceType(ObjectType):

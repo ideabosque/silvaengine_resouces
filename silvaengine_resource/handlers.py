@@ -75,11 +75,14 @@ def _add_resource_handler(packages):
 
     # Insert resource / function / config data.
     for package in packages:
+        print(f"{package} start")
         # 1. Load module by dynamic
         spec = find_spec(package)
 
         if spec is None:
             continue
+
+        print(f"Processing {package} ...")
 
         module = import_module(package)
 
@@ -105,6 +108,9 @@ def _add_resource_handler(packages):
                     function_name,
                 ).lower()
                 resource_id = md5(factor.encode(encoding="UTF-8")).hexdigest()
+                mutations = getOperations(config.get("create"), True)
+                mutations += getOperations(config.get("update"), True)
+                mutations += getOperations(config.get("delete"), True)
                 # Add new resource to table se-resource
                 statements.append(
                     {
@@ -120,21 +126,25 @@ def _add_resource_handler(packages):
                                 else "",
                                 "status": Status.enabled,
                                 "operations": {
-                                    "create": getOperations(config.get("create"), True),
+                                    "mutation": mutations,
+                                    # "create": getOperations(config.get("create"), True),
                                     "query": getOperations(config.get("query"), True),
-                                    "update": getOperations(config.get("update"), True),
-                                    "delete": getOperations(config.get("delete"), True),
+                                    # "update": getOperations(config.get("update"), True),
+                                    # "delete": getOperations(config.get("delete"), True),
                                 },
                                 "created_at": now,
                                 "updated_at": now,
                                 # "updated_by": updated_by,
-                            }
+                            },
                         ),
                         # "condition": ResourceModel.resource_id != resource_id,
                     }
                 )
 
                 # Add new function to table se-functions
+                mutations = getOperations(config.get("create"))
+                mutations += getOperations(config.get("update"))
+                mutations += getOperations(config.get("delete"))
                 statements.append(
                     {
                         "statement": FunctionsModel(
@@ -164,13 +174,14 @@ def _add_resource_handler(packages):
                                     if config.get("is_graphql")
                                     else False,
                                     "operations": {
-                                        "create": getOperations(config.get("create")),
+                                        # "create": getOperations(config.get("create")),
+                                        "mutation": list(set(mutations)),
                                         "query": getOperations(config.get("query")),
-                                        "update": getOperations(config.get("update")),
-                                        "delete": getOperations(config.get("delete")),
+                                        # "update": getOperations(config.get("update")),
+                                        # "delete": getOperations(config.get("delete")),
                                     },
                                 },
-                            }
+                            },
                         ),
                         # "condition": FunctionsModel.function.does_not_exist(),
                     }

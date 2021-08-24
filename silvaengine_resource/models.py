@@ -49,10 +49,11 @@ class ResourceOperationItemMap(MapAttribute):
 
 
 class ResourceOperationMap(MapAttribute):
-    create = ListAttribute(of=ResourceOperationItemMap)
+    # create = ListAttribute(of=ResourceOperationItemMap)
     query = ListAttribute(of=ResourceOperationItemMap)
-    update = ListAttribute(of=ResourceOperationItemMap)
-    delete = ListAttribute(of=ResourceOperationItemMap)
+    mutation = ListAttribute(of=ResourceOperationItemMap)
+    # update = ListAttribute(of=ResourceOperationItemMap)
+    # delete = ListAttribute(of=ResourceOperationItemMap)
 
 
 class ResourceModel(BaseModel):
@@ -106,10 +107,11 @@ class ConnectionsModel(BaseModel):
 
 
 class OperationMap(MapAttribute):
-    create = ListAttribute()
+    # create = ListAttribute()
     query = ListAttribute()
-    update = ListAttribute()
-    delete = ListAttribute()
+    mutation = ListAttribute()
+    # update = ListAttribute()
+    # delete = ListAttribute()
 
 
 class ConfigMap(MapAttribute):
