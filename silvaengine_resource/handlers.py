@@ -75,14 +75,11 @@ def _add_resource_handler(packages):
 
     # Insert resource / function / config data.
     for package in packages:
-        print(f"{package} start")
         # 1. Load module by dynamic
         spec = find_spec(package)
 
         if spec is None:
             continue
-
-        print(f"Processing {package} ...")
 
         module = import_module(package)
 
@@ -205,6 +202,7 @@ def _add_resource_handler(packages):
 
     # Insert by batch
     if len(statements):
+        print("Start setting configuration information: ")
         # @TODO: If statements total more than 25, should use batchWrite to replace.
         # with TransactWrite(
         #     connection=Connection(region=ResourceModel.Meta.region),

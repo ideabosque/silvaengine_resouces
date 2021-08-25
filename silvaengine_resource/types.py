@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
+
 __author__ = "bl"
 
 from graphene import ObjectType, InputObjectType, String, DateTime, Int, List, Field
+from silvaengine_utility import JSON
 
 
 class ResourceOperationItemMap(ObjectType):
@@ -13,11 +15,8 @@ class ResourceOperationItemMap(ObjectType):
 
 
 class ResourceOperationMap(ObjectType):
-    # create = List(ResourceOperationItemMap)
     query = List(ResourceOperationItemMap)
     mutation = List(ResourceOperationItemMap)
-    # update = List(ResourceOperationItemMap)
-    # delete = List(ResourceOperationItemMap)
 
 
 class ResourceType(ObjectType):
@@ -34,11 +33,6 @@ class ResourceType(ObjectType):
     updated_by = String()
 
 
-class LastEvaluatedKey(ObjectType):
-    hash_key = String()
-    range_key = String()
-
-
 class PageInputType(InputObjectType):
     hash_key = String()
     range_key = String()
@@ -46,7 +40,7 @@ class PageInputType(InputObjectType):
 
 class ResourcesType(ObjectType):
     items = List(ResourceType)
-    last_evaluated_key = Field(LastEvaluatedKey)
+    last_evaluated_key = JSON()
 
 
 class ResourceInputType(InputObjectType):

@@ -48,39 +48,14 @@ class SilvaEngineResourceTest(unittest.TestCase):
 
     # @unittest.skip("demonstrating skipping")
     def test_graphql_get_resource(self):
-        # query = """
-        #     query resources(
-        #             $limit: Int!
-        #         ){
-        #         resources(
-        #             limit: $limit
-        #         ){
-        #             resourceId
-        #             service
-        #             moduleName,
-        #             className,
-        #             function,
-        #             operations,
-        #             label,
-        #             status
-        #             createdAt
-        #             updatedAt
-        #             updatedBy
-        #             lastEvaluatedKey
-        #         }
-        #     }
-        # # """
 
         variables = {
             "limit": 10,
-            "lastEvaluatedKey": {
-                "hashKey": "832be4700056ff454e4129f954c8c1f7",
-                "rangeKey": "analytics ",
-            },
+            "lastEvaluatedKey": {},
         }
 
         query = """
-            query resources($limit: Int!, $lastEvaluatedKey: PageInputType) {
+            query resources($limit: Int!, $lastEvaluatedKey: JSON) {
                 resources(limit: $limit, lastEvaluatedKey: $lastEvaluatedKey) {
                     items {
                         resourceId
@@ -94,31 +69,19 @@ class SilvaEngineResourceTest(unittest.TestCase):
                         updatedAt
                         updatedBy
                         operations {
-                            create {
-                                label
-                                action
-                            }
                             query {
                                 label
                                 action
                             }
-                            update {
-                                label
-                                action
-                            }
-                            delete {
+                            mutation {
                                 label
                                 action
                             }
                         }
                     }
-                    lastEvaluatedKey {
-                        hashKey
-                        rangeKey
-                    }
+                    lastEvaluatedKey
                 }
             }
-
         """
 
         # variables = {

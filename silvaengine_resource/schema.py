@@ -2,12 +2,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
-from graphene.types.field import Field
-
 __author__ = "bl"
 
-from graphene import ObjectType, String, Int, Schema
-from .types import ResourcesType, PageInputType
+from graphene import ObjectType, String, Int, Schema, Field
+from silvaengine_utility import JSON
+from .types import ResourcesType
 from .queries import resolve_resources
 
 
@@ -20,7 +19,7 @@ class Query(ObjectType):
     resources = Field(
         ResourcesType,
         limit=Int(),
-        last_evaluated_key=PageInputType(),
+        last_evaluated_key=JSON(),
         resource_id=String(),
     )
 
