@@ -108,35 +108,39 @@ def _add_resource_handler(packages):
                 mutations = getOperations(config.get("create"), True)
                 mutations += getOperations(config.get("update"), True)
                 mutations += getOperations(config.get("delete"), True)
+
                 # Add new resource to table se-resource
-                statements.append(
-                    {
-                        "statement": ResourceModel(
-                            resource_id,
-                            profile.get("service"),
-                            **{
-                                "module_name": package,
-                                "class_name": profile.get("class"),
-                                "function": function_name,
-                                "label": config.get("label")
-                                if config.get("label")
-                                else "",
-                                "status": Status.enabled,
-                                "operations": {
-                                    "mutation": mutations,
-                                    # "create": getOperations(config.get("create"), True),
-                                    "query": getOperations(config.get("query"), True),
-                                    # "update": getOperations(config.get("update"), True),
-                                    # "delete": getOperations(config.get("delete"), True),
+                if not config.get("disabled_in_resources", False):
+                    statements.append(
+                        {
+                            "statement": ResourceModel(
+                                resource_id,
+                                profile.get("service"),
+                                **{
+                                    "module_name": package,
+                                    "class_name": profile.get("class"),
+                                    "function": function_name,
+                                    "label": config.get("label")
+                                    if config.get("label")
+                                    else "",
+                                    "status": Status.enabled,
+                                    "operations": {
+                                        "mutation": mutations,
+                                        # "create": getOperations(config.get("create"), True),
+                                        "query": getOperations(
+                                            config.get("query"), True
+                                        ),
+                                        # "update": getOperations(config.get("update"), True),
+                                        # "delete": getOperations(config.get("delete"), True),
+                                    },
+                                    "created_at": now,
+                                    "updated_at": now,
+                                    # "updated_by": updated_by,
                                 },
-                                "created_at": now,
-                                "updated_at": now,
-                                # "updated_by": updated_by,
-                            },
-                        ),
-                        # "condition": ResourceModel.resource_id != resource_id,
-                    }
-                )
+                            ),
+                            # "condition": ResourceModel.resource_id != resource_id,
+                        }
+                    )
 
                 # Add new function to table se-functions
                 mutations = getOperations(config.get("create"))
