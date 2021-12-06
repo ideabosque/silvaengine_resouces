@@ -18,7 +18,7 @@ def deploy() -> list:
             "functions": {
                 "resource_graphql": {
                     "is_static": False,
-                    "label": "Resource",
+                    "label": "Resources",
                     "query": [
                         {
                             "action": "resources",
