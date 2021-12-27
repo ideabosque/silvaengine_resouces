@@ -109,6 +109,11 @@ def _add_resource_handler(packages):
                 mutations += getOperations(config.get("update"), True)
                 mutations += getOperations(config.get("delete"), True)
 
+                try:
+                    ResourceModel(resource_id, profile.get("service")).delete()
+                except:
+                    pass
+
                 # Add new resource to table se-resource
                 if not config.get("disabled_in_resources", False):
                     statements.append(
