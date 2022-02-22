@@ -43,7 +43,8 @@ class Resource(object):
 
     @staticmethod
     def add_resource(packages):
-        return _add_resource_handler(packages)
+        if type(packages) is list and len(packages):
+            return _add_resource_handler(list(set(packages)))
 
     def resource_graphql(self, **params):
         try:
