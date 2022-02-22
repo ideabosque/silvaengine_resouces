@@ -52,7 +52,7 @@ def _add_resource_handler(packages):
     def getOperations(payload, returnMap=False) -> list:
         operations = []
 
-        if payload is not None:
+        if type(payload) is list and len(payload):
             attributes = ["label", "action"] if returnMap else ["action"]
             al = len(attributes)
 
@@ -96,7 +96,7 @@ def _add_resource_handler(packages):
             if not profile.get("class"):
                 continue
 
-            for function_name, config in profile.get("functions").items():
+            for function_name, config in profile.get("functions", []).items():
                 function_name = function_name.lower().strip()
                 # Factor of generate resource ID
                 factor = "{}-{}-{}".format(
@@ -105,9 +105,13 @@ def _add_resource_handler(packages):
                     function_name,
                 ).lower()
                 resource_id = md5(factor.encode(encoding="UTF-8")).hexdigest()
-                mutations = getOperations(config.get("create"), True)
-                mutations += getOperations(config.get("update"), True)
-                mutations += getOperations(config.get("delete"), True)
+                mutations = []
+                # mutations = getOperations(config.get("create"), True)
+                # mutations += getOperations(config.get("update"), True)
+                # mutations += getOperations(config.get("delete"), True)
+
+                for action in ["create", "update", "delete", "mutation"]:
+                    mutations += getOperations(config.get(action), True)
 
                 try:
                     ResourceModel(resource_id, profile.get("service")).delete()
@@ -125,18 +129,13 @@ def _add_resource_handler(packages):
                                     "module_name": package,
                                     "class_name": profile.get("class"),
                                     "function": function_name,
-                                    "label": config.get("label")
-                                    if config.get("label")
-                                    else "",
+                                    "label": config.get("label", ""),
                                     "status": Status.enabled,
                                     "operations": {
                                         "mutation": mutations,
-                                        # "create": getOperations(config.get("create"), True),
                                         "query": getOperations(
                                             config.get("query"), True
                                         ),
-                                        # "update": getOperations(config.get("update"), True),
-                                        # "delete": getOperations(config.get("delete"), True),
                                     },
                                     "created_at": now,
                                     "updated_at": now,
@@ -148,9 +147,14 @@ def _add_resource_handler(packages):
                     )
 
                 # Add new function to table se-functions
-                mutations = getOperations(config.get("create"))
-                mutations += getOperations(config.get("update"))
-                mutations += getOperations(config.get("delete"))
+                # mutations = getOperations(config.get("create"))
+                # mutations += getOperations(config.get("update"))
+                # mutations += getOperations(config.get("delete"))
+                mutations = []
+
+                for action in ["create", "update", "delete", "mutation"]:
+                    mutations += getOperations(config.get(action))
+
                 statements.append(
                     {
                         "statement": FunctionsModel(
@@ -160,31 +164,20 @@ def _add_resource_handler(packages):
                                 "area": area,
                                 "config": {
                                     "class_name": profile.get("class"),
-                                    "funct_type": config.get("type")
-                                    if config.get("type")
-                                    else "RequestResponse",
+                                    "funct_type": config.get("type", "RequestResponse"),
                                     "methods": config.get("support_methods")
                                     if type(config.get("support_methods")) is list
                                     and len(config.get("support_methods"))
                                     else ["POST", "GET"],
                                     "module_name": package,
-                                    "setting": config.get("settings")
-                                    if config.get("settings")
-                                    else package,
+                                    "setting": config.get("settings", package),
                                     "auth_required": bool(
-                                        config.get("is_auth_required")
-                                    )
-                                    if config.get("is_auth_required")
-                                    else False,
-                                    "graphql": bool(config.get("is_graphql"))
-                                    if config.get("is_graphql")
-                                    else False,
+                                        config.get("is_auth_required", False)
+                                    ),
+                                    "graphql": bool(config.get("is_graphql", True)),
                                     "operations": {
-                                        # "create": getOperations(config.get("create")),
                                         "mutation": list(set(mutations)),
                                         "query": getOperations(config.get("query")),
-                                        # "update": getOperations(config.get("update")),
-                                        # "delete": getOperations(config.get("delete")),
                                     },
                                 },
                             },
@@ -232,4 +225,4 @@ def _add_resource_handler(packages):
 
             print("Completed:", item.get("statement"))
 
-    print("Done")
+    print("Done!")

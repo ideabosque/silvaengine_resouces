@@ -46,44 +46,45 @@ class Resource(object):
         return _add_resource_handler(packages)
 
     def resource_graphql(self, **params):
-        schema = Schema(
-            query=Query,
-            types=type_class(),
-        )
-        ctx = {"logger": self.logger}
-        variables = params.get("variables", {})
-        query = params.get("query")
+        try:
+            schema = Schema(
+                query=Query,
+                types=type_class(),
+            )
+            context = {"logger": self.logger}
+            variables = params.get("variables", {})
+            operations = params.get("query")
+            response = {
+                "errors": "Invalid operations.",
+                "status_code": 400,
+            }
 
-        if query is not None:
+            if not operations:
+                return Utility.json_dumps(response)
+
             execution_result = schema.execute(
-                query, context_value=ctx, variable_values=variables
+                operations, context_value=context, variable_values=variables
             )
 
-        mutation = params.get("mutation")
-
-        if mutation is not None:
-            execution_result = schema.execute(
-                mutation, context_value=ctx, variable_values=variables
-            )
-
-        if not execution_result:
-            return None
-
-        status_code = 400 if execution_result.invalid else 200
-
-        if execution_result.errors:
-            return Utility.json_dumps(
-                {
+            if not execution_result:
+                response = {
+                    "errors": "Invalid execution result.",
+                }
+            elif execution_result.errors:
+                response = {
                     "errors": [
                         Utility.format_error(e) for e in execution_result.errors
                     ],
-                    "status_code": 500,
                 }
-            )
+            elif execution_result.invalid:
+                response = execution_result
+            elif execution_result.data:
+                response = {"data": execution_result.data, "status_code": 200}
+            else:
+                response = {
+                    "errors": "Uncaught execution error.",
+                }
 
-        return Utility.json_dumps(
-            {
-                "data": execution_result.data,
-                "status_code": status_code,
-            }
-        )
+            return Utility.json_dumps(response)
+        except Exception as e:
+            raise e
