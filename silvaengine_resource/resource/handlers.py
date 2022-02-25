@@ -76,6 +76,7 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
         )
         now = datetime.utcnow()
         mutation_actions = ["create", "update", "delete", "mutation"]
+        connection_functions = {}
 
         # Insert resource / function / config data.
         for package in packages:
@@ -190,38 +191,38 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
                         }
                     )
 
-                    # 2.3 Add function setting to se-connections
-                    for connection in ConnectionsModel.query(apply_to):
-                        functions = connection.functions
+                    # 2.3 Build function list for connections.
+                    connection_functions[function_name.lower()] = {
+                        "aws_lambda_arn": aws_lambda_arn,
+                        "function": function_name,
+                        "setting": "",
+                    }
 
-                        if len(
-                            [
-                                item.function
-                                for item in functions
-                                if item.function == function_name
-                            ]
-                        ):
-                            continue
+        # 2.3 Add function setting to se-connections
+        if len(connection_functions.values()) > 0:
+            keys = connection_functions.keys()
 
-                        functions.append(
-                            {
-                                "aws_lambda_arn": aws_lambda_arn,
-                                "function": function_name,
-                                "setting": "",
-                            }
-                        )
+            for connection in ConnectionsModel.query(apply_to):
+                functions = dict(
+                    (str(item.function).strip().lower(), item)
+                    for item in connection.functions
+                    if item.function
+                )
 
-                        statements.append(
-                            {
-                                "statement": ConnectionsModel(
-                                    apply_to,
-                                    connection.api_key,
-                                    **{
-                                        "functions": functions,
-                                    },
-                                ),
-                            }
-                        )
+                for key in list(set(keys) & set()):
+                    connection_functions[key] = functions[key]
+
+                statements.append(
+                    {
+                        "statement": ConnectionsModel(
+                            apply_to,
+                            connection.api_key,
+                            **{
+                                "functions": connection_functions.values(),
+                            },
+                        ),
+                    }
+                )
 
         # Insert by batch
         if len(statements):
