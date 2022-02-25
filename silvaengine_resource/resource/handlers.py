@@ -80,7 +80,9 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
         # Insert resource / function / config data.
         for package in packages:
             # 1. Load module by dynamic
-            fn_deploy = Utility.import_dynamically(package, "deploy")
+            fn_deploy = Utility.import_dynamically(
+                module_name=package, function_name="deploy"
+            )
 
             if not callable(fn_deploy):
                 continue
