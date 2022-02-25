@@ -24,7 +24,6 @@ setup(
     platforms="Linux",
     install_requires=[
         "SilvaEngine-Utility",
-        "SilvaEngine-Base",
         "pynamodb",
     ],
     classifiers=[

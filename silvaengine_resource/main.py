@@ -6,8 +6,9 @@ __author__ = "bl"
 
 from graphene import Schema
 from silvaengine_utility import Utility
-from .handlers import _add_resource_handler
-from .schema import Query, type_class
+from .resource.handlers import add_resource_handler
+from .resource.schema import Query, type_class
+from .resource.enumerations import Channel
 
 # Hook function applied to deployment
 def deploy() -> list:
@@ -15,6 +16,7 @@ def deploy() -> list:
         {
             "service": "resources",
             "class": "Resource",
+            "apply_to": Channel.SS3.value,
             "functions": {
                 "resource_graphql": {
                     "is_static": False,
@@ -29,7 +31,7 @@ def deploy() -> list:
                     "support_methods": ["POST"],
                     "is_auth_required": False,
                     "is_graphql": True,
-                    "disabled_in_resources": True,
+                    "disabled_in_resources": True,  # Ignore adding to resource list.
                 }
             },
         }
@@ -44,15 +46,12 @@ class Resource(object):
     @staticmethod
     def add_resource(packages):
         if type(packages) is list and len(packages):
-            return _add_resource_handler(list(set(packages)))
+            return add_resource_handler(list(set(packages)))
 
     def resource_graphql(self, **params):
         try:
-            schema = Schema(
-                query=Query,
-                types=type_class(),
-            )
             context = {"logger": self.logger}
+            schema = Schema(query=Query, types=type_class())
             variables = params.get("variables", {})
             operations = params.get("query")
             response = {
