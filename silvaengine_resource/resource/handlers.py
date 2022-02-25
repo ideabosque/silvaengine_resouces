@@ -195,9 +195,11 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
                         functions = connection.functions
 
                         if len(
-                            item.function
-                            for item in functions
-                            if item.function == function_name
+                            [
+                                item.function
+                                for item in functions
+                                if item.function == function_name
+                            ]
                         ):
                             continue
 
