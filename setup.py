@@ -23,7 +23,7 @@ setup(
     zip_safe=False,
     platforms="Linux",
     install_requires=[
-        "SilvaEngine-Utility",
+        "silvaengine_utility",
         "pynamodb",
     ],
     classifiers=[

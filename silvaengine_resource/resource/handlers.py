@@ -16,7 +16,7 @@ from .models import (
     ConfigDataModel,
     ConnectionsModel,
 )
-from .enumerations import Channel, SwitchStatus
+from .enumerations import SwitchStatus
 import boto3
 
 
@@ -42,8 +42,16 @@ def _get_operations(payload, returnMap=False) -> list:
     return operations
 
 
-def add_resource_handler(packages):
+def add_resource_handler(cloud_function_name, apply_to, packages):
     try:
+        if (
+            not cloud_function_name
+            or not apply_to
+            or type(packages) is not list
+            or len(packages) < 1
+        ):
+            return
+
         identity = boto3.client(
             "sts",
             region_name=ResourceModel.Meta.region,
@@ -61,8 +69,10 @@ def add_resource_handler(packages):
         # endpoint_id = ResourceModel.Meta.aws_endpoint_id
 
         # TODO: Get region / IAM Number from env.
-        aws_lambda_arn = "arn:aws:lambda:{}:{}:function:silvaengine_microcore".format(
-            ResourceModel.Meta.region, identity.get("Account")
+        aws_lambda_arn = "arn:aws:lambda:{}:{}:function:{}".format(
+            ResourceModel.Meta.region,
+            identity.get("Account"),
+            str(cloud_function_name).strip(),
         )
         now = datetime.utcnow()
         mutation_actions = ["create", "update", "delete", "mutation"]
@@ -88,7 +98,6 @@ def add_resource_handler(packages):
                     continue
 
                 service = str(profile.get("service", package)).strip()
-                apply_to = int(str(profile.get("apply_to", Channel.SS3.value)).strip())
 
                 for function_name, config in profile.get("functions", []).items():
                     function_name = str(function_name).strip()
@@ -194,6 +203,7 @@ def add_resource_handler(packages):
                             {
                                 "aws_lambda_arn": aws_lambda_arn,
                                 "function": function_name,
+                                "setting": "",
                             }
                         )
 
@@ -206,7 +216,6 @@ def add_resource_handler(packages):
                                         "functions": functions,
                                     },
                                 ),
-                                # "condition": FunctionsModel.function.does_not_exist(),
                             }
                         )
 

@@ -8,7 +8,6 @@ from graphene import Schema
 from silvaengine_utility import Utility
 from .resource.handlers import add_resource_handler
 from .resource.schema import Query, type_class
-from .resource.enumerations import Channel
 
 # Hook function applied to deployment
 def deploy() -> list:
@@ -16,7 +15,6 @@ def deploy() -> list:
         {
             "service": "resources",
             "class": "Resource",
-            "apply_to": Channel.SS3.value,
             "functions": {
                 "resource_graphql": {
                     "is_static": False,
@@ -44,9 +42,10 @@ class Resource(object):
         self.setting = setting
 
     @staticmethod
-    def add_resource(packages):
-        if type(packages) is list and len(packages):
-            return add_resource_handler(list(set(packages)))
+    def add_resource(cloud_function_name, apply_to, packages):
+        return add_resource_handler(
+            str(cloud_function_name).strip(), str(apply_to).strip(), list(set(packages))
+        )
 
     def resource_graphql(self, **params):
         try:

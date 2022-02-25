@@ -45,11 +45,8 @@ class ResourceOperationItemMap(MapAttribute):
 
 
 class ResourceOperationMap(MapAttribute):
-    # create = ListAttribute(of=ResourceOperationItemMap)
     query = ListAttribute(of=ResourceOperationItemMap)
     mutation = ListAttribute(of=ResourceOperationItemMap)
-    # update = ListAttribute(of=ResourceOperationItemMap)
-    # delete = ListAttribute(of=ResourceOperationItemMap)
 
 
 class ResourceModel(BaseModel):
