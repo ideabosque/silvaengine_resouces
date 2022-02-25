@@ -32,7 +32,7 @@ def _get_operations(payload, returnMap=False) -> list:
 
         for item in payload:
             if al == 1:
-                operations += [item[k] for k in item.keys if k in attributes]
+                operations += [item[k] for k in item.keys() if k in attributes]
             else:
                 pairs = {k: item[k] for k in item.keys() if k in attributes}
 
