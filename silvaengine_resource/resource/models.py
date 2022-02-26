@@ -88,7 +88,7 @@ class EndpointsModel(BaseModel):
 class FunctionMap(MapAttribute):
     aws_lambda_arn = UnicodeAttribute()
     function = UnicodeAttribute()
-    setting = UnicodeAttribute()
+    setting = UnicodeAttribute(null=True)
 
 
 class ConnectionsModel(BaseModel):
