@@ -24,6 +24,7 @@ class ResourceType(ObjectType):
     module_name = String()
     class_name = String()
     function = String()
+    apply_to = String()
     operations = Field(ResourceOperationMap)
     label = String()
     status = Int()
