@@ -15,6 +15,7 @@ from .models import (
     FunctionsModel,
     ConfigDataModel,
     ConnectionsModel,
+    FunctionMap,
 )
 from .enumerations import SwitchStatus
 import boto3
@@ -192,11 +193,13 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
                     )
 
                     # 2.3 Build function list for connections.
-                    connection_functions[function_name.lower()] = {
-                        "aws_lambda_arn": aws_lambda_arn,
-                        "function": function_name,
-                        "setting": "",
-                    }
+                    connection_functions[function_name.lower()] = FunctionMap(
+                        **{
+                            "aws_lambda_arn": aws_lambda_arn,
+                            "function": function_name,
+                            "setting": "",
+                        }
+                    )
 
         # 2.3 Add function setting to se-connections
         if len(connection_functions.values()) > 0:
@@ -209,8 +212,9 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
                     if item.function
                 )
 
-                for key in list(set(keys) & set()):
-                    connection_functions[key] = functions[key]
+                for key in list(set(list(keys) + list(functions.keys()))):
+                    if functions.get(key):
+                        connection_functions[key] = functions[key]
 
                 statements.append(
                     {
