@@ -38,7 +38,9 @@ def resolve_resources(info, **kwargs):
         ]
 
     results = ResourceModel.scan(
-        limit=int(limit), last_evaluated_key=last_evaluated_key
+        limit=int(limit),
+        filter_condition=(ResourceModel.apply_to == info.context.get("channel")),
+        last_evaluated_key=last_evaluated_key,
     )
 
     resources = [

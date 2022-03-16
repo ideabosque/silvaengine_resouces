@@ -49,7 +49,17 @@ class Resource(object):
 
     def resource_graphql(self, **params):
         try:
-            context = {"logger": self.logger}
+            channel = params.get("endpoint_id", "api")
+
+            if not channel:
+                raise Exception("Unrecognized request origin", 401)
+
+            context = {
+                "logger": self.logger,
+                "setting": self.setting,
+                "context": params.get("context", {}),
+                "channel": str(channel).strip(),
+            }
             schema = Schema(query=Query, types=type_class())
             variables = params.get("variables", {})
             operations = params.get("query")
