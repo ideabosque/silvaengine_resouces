@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-
 from silvaengine_utility import Utility
 from pynamodb.connection import Connection
 from pynamodb.transactions import TransactWrite
@@ -106,11 +105,14 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
                 for function_name, config in profile.get("functions", []).items():
                     function_name = str(function_name).strip()
                     # Factor of generate resource ID
-                    factor = "{}-{}-{}".format(
-                        str(package).strip(),
-                        str(profile.get("class", "")).strip(),
-                        function_name,
-                    ).lower()
+                    factor = (
+                        "{module_name}-{class_name}-{function_name}-{channel}".format(
+                            module_name=str(package).strip(),
+                            class_name=str(profile.get("class", "")).strip(),
+                            function_name=function_name,
+                            channel=str(apply_to).strip(),
+                        ).lower()
+                    )
                     resource_id = md5(factor.encode(encoding="UTF-8")).hexdigest()
                     mutations = []
 
