@@ -42,7 +42,7 @@ class BaseModel(Model):
 class ResourceOperationItemMap(MapAttribute):
     label = UnicodeAttribute()
     action = UnicodeAttribute()
-    visible = UnicodeAttribute(null=True)
+    visible = NumberAttribute(default=1)
 
 
 class ResourceOperationMap(MapAttribute):
