@@ -42,15 +42,36 @@ def resolve_resources(info, **kwargs):
         filter_condition=(ResourceModel.apply_to == info.context.get("channel")),
         last_evaluated_key=last_evaluated_key,
     )
+    resources = []
 
-    resources = [
-        ResourceType(
-            **Utility.json_loads(
-                Utility.json_dumps(dict(**resource.__dict__["attribute_values"]))
+    for resource in results:
+        for k, v in resource.operations.query:
+            if v.visible == False:
+                resource.operations.query.pop(k)
+
+        for k, v in resource.operations.mutation:
+            if v.visible == False:
+                resource.operations.mutation.pop(k)
+
+        if len(resource.operations.query) + len(resource.operations.mutation) > 0:
+            resources.append(
+                ResourceType(
+                    **Utility.json_loads(
+                        Utility.json_dumps(
+                            dict(**resource.__dict__["attribute_values"])
+                        )
+                    )
+                )
             )
-        )
-        for resource in results
-    ]
+
+    # resources = [
+    #     ResourceType(
+    #         **Utility.json_loads(
+    #             Utility.json_dumps(dict(**resource.__dict__["attribute_values"]))
+    #         )
+    #     )
+    #     for resource in results
+    # ]
 
     if results.total_count < 1:
         return None
