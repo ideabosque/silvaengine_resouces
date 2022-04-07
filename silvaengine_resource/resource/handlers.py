@@ -27,7 +27,7 @@ def _get_operations(payload, returnMap=False) -> list:
     operations = []
 
     if type(payload) is list and len(payload):
-        attributes = ["label", "action"] if returnMap else ["action"]
+        attributes = ["label", "action", "visible"] if returnMap else ["action"]
         al = len(attributes)
 
         for item in payload:
