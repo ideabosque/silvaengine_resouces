@@ -119,8 +119,6 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
                     for action in mutation_actions:
                         mutations += _get_operations(config.get(action), True)
 
-                    print(mutations)
-
                     try:
                         ResourceModel(resource_id, service).delete()
                     except:
