@@ -138,9 +138,6 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
                                 return_as_map=True,
                             )
 
-                        print("Resource `{}` mutations:::::".format(package), mutations)
-                        print("Resource `{}` queries:::::".format(package), queries)
-
                         statements.append(
                             {
                                 "statement": ResourceModel(
