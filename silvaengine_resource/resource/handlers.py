@@ -23,11 +23,12 @@ import boto3
 __author__ = "bl"
 
 
-def _get_operations(payload, returnMap=False) -> list:
+def _get_operations(payload, return_as_map=False) -> list:
     operations = []
 
     if type(payload) is list and len(payload):
-        attributes = ["label", "action"] if returnMap else ["action"]
+        required_attributes = ["label", "action"]
+        attributes = required_attributes + ["visible"] if return_as_map else ["action"]
         al = len(attributes)
 
         for item in payload:
@@ -36,7 +37,9 @@ def _get_operations(payload, returnMap=False) -> list:
             else:
                 pairs = {k: item[k] for k in item.keys() if k in attributes}
 
-                if len(pairs.keys()) == al:
+                if len(
+                    list(set(required_attributes).intersection(set(pairs.keys())))
+                ) == len(required_attributes):
                     operations.append(pairs)
 
     return operations
@@ -114,10 +117,6 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
                         ).lower()
                     )
                     resource_id = md5(factor.encode(encoding="UTF-8")).hexdigest()
-                    mutations = []
-
-                    for action in mutation_actions:
-                        mutations += _get_operations(config.get(action), True)
 
                     try:
                         ResourceModel(resource_id, service).delete()
@@ -126,6 +125,21 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
 
                     # 2.1 Add new resource to table se-resource
                     if not config.get("disabled_in_resources", False):
+                        queries = _get_operations(
+                            payload=config.get("query"),
+                            return_as_map=True,
+                        )
+                        mutations = []
+
+                        for action in mutation_actions:
+                            mutations += _get_operations(
+                                payload=config.get(action),
+                                return_as_map=True,
+                            )
+
+                        print("Resource `{}` mutations:::::".format(package), mutations)
+                        print("Resource `{}` queries:::::".format(package), queries)
+
                         statements.append(
                             {
                                 "statement": ResourceModel(
@@ -140,9 +154,7 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
                                         "status": SwitchStatus.YES.value,
                                         "operations": {
                                             "mutation": mutations,
-                                            "query": _get_operations(
-                                                config.get("query"), True
-                                            ),
+                                            "query": queries,
                                         },
                                         "created_at": now,
                                         "updated_at": now,
@@ -154,10 +166,17 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
                         )
 
                     # 2.2 Add new function to table se-functions
+                    support_methods = (
+                        config.get("support_methods")
+                        if type(config.get("support_methods")) is list
+                        and len(config.get("support_methods"))
+                        else ["POST", "GET"]
+                    )
+                    queries = _get_operations(payload=config.get("query"))
                     mutations = []
 
                     for action in mutation_actions:
-                        mutations += _get_operations(config.get(action))
+                        mutations += _get_operations(payload=config.get(action))
 
                     statements.append(
                         {
@@ -171,10 +190,7 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
                                         "funct_type": config.get(
                                             "type", "RequestResponse"
                                         ),
-                                        "methods": config.get("support_methods")
-                                        if type(config.get("support_methods")) is list
-                                        and len(config.get("support_methods"))
-                                        else ["POST", "GET"],
+                                        "methods": support_methods,
                                         "module_name": str(package).strip(),
                                         "setting": config.get("settings", package),
                                         "auth_required": bool(
@@ -183,9 +199,7 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
                                         "graphql": bool(config.get("is_graphql", True)),
                                         "operations": {
                                             "mutation": list(set(mutations)),
-                                            "query": _get_operations(
-                                                config.get("query")
-                                            ),
+                                            "query": list(set(queries)),
                                         },
                                     },
                                 },
