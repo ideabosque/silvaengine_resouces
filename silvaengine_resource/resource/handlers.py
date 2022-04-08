@@ -6,6 +6,7 @@ from pynamodb.connection import Connection
 from pynamodb.transactions import TransactWrite
 from pynamodb.exceptions import TransactWriteError
 from datetime import datetime
+from dotenv import load_dotenv
 from importlib.util import find_spec
 from importlib import import_module
 from hashlib import md5
@@ -17,7 +18,7 @@ from .models import (
     FunctionMap,
 )
 from .enumerations import SwitchStatus
-import boto3
+import boto3, os
 
 
 __author__ = "bl"
@@ -270,3 +271,18 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
         print("Done!")
     except Exception as e:
         raise e
+
+
+def get_env_variables(settings, variable_name):
+    if type(settings) is dict and settings.get(str(variable_name).strip()):
+        return settings.get(str(variable_name).strip())
+
+    load_dotenv()
+
+    return os.getenv(
+        key=str(variable_name).strip(),
+        default=os.getenv(
+            key=str(variable_name).strip().upper(),
+            default=os.getenv(str(variable_name).strip().lower()),
+        ),
+    )
