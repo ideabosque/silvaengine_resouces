@@ -1,7 +1,16 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-from graphene import ObjectType, InputObjectType, String, DateTime, Int, List, Field
+from graphene import (
+    ObjectType,
+    InputObjectType,
+    String,
+    DateTime,
+    Int,
+    List,
+    Field,
+    Boolean,
+)
 from silvaengine_utility import JSON
 
 
@@ -11,6 +20,7 @@ __author__ = "bl"
 class ResourceOperationItemMap(ObjectType):
     label = String()
     action = String()
+    # visible = Boolean()
 
 
 class ResourceOperationMap(ObjectType):

@@ -20,23 +20,6 @@ class BaseModel(Model):
     class Meta:
         billing_mode = "PAY_PER_REQUEST"
         region = os.getenv("REGIONNAME", "us-east-1")
-        aws_access_key_id = os.getenv("aws_access_key_id")
-        aws_secret_access_key = os.getenv("aws_secret_access_key")
-        aws_api_area = os.getenv("aws_api_area", "core")
-        aws_endpoint_id = os.getenv("aws_endpoint_id", "api")
-
-        if region is None or aws_access_key_id is None or aws_secret_access_key is None:
-            from dotenv import load_dotenv
-
-            if load_dotenv():
-                if region is None:
-                    region = os.getenv("region_name")
-
-                if aws_access_key_id is None:
-                    aws_access_key_id = os.getenv("aws_access_key_id")
-
-                if aws_secret_access_key is None:
-                    aws_secret_access_key = os.getenv("aws_secret_access_key")
 
 
 class ResourceOperationItemMap(MapAttribute):

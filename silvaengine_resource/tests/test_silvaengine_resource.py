@@ -11,9 +11,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 setting = {
-    "region_name": os.getenv("region_name"),
-    "aws_access_key_id": os.getenv("aws_access_key_id"),
-    "aws_secret_access_key": os.getenv("aws_secret_access_key"),
+    "region_name": os.getenv("AWS_REGION_NAME"),
+    "aws_access_key_id": os.getenv("AWS_ACCESS_KEY_ID"),
+    "aws_secret_access_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
 }
 
 sys.path.insert(0, "/var/www/projects/silvaengine_resouces")
@@ -50,13 +50,13 @@ class SilvaEngineResourceTest(unittest.TestCase):
     def test_graphql_get_resource(self):
 
         variables = {
-            "limit": 10,
+            "limit": 1000,
             "lastEvaluatedKey": {},
+            # "resourceId": "5efb66cd78a2d3e22a545eca272871de",
         }
-
         query = """
-            query resources($limit: Int!, $lastEvaluatedKey: JSON) {
-                resources(limit: $limit, lastEvaluatedKey: $lastEvaluatedKey) {
+            query resources($limit: Int!, $lastEvaluatedKey: JSON, $resourceId: String) {
+                resources(limit: $limit, lastEvaluatedKey: $lastEvaluatedKey, resourceId: $resourceId) {
                     items {
                         resourceId
                         service
@@ -83,16 +83,6 @@ class SilvaEngineResourceTest(unittest.TestCase):
                 }
             }
         """
-
-        # variables = {
-        #     "limit": 1,
-        #     "lastEvaluatedKey": Utility.json_dumps(
-        #         {
-        #             "service": {"S": "subscription_management"},
-        #             "resource_id": {"S": "053429072013b1fc6eeac9555cd4618b"},
-        #         }
-        #     ),
-        # }
 
         payload = {"query": query, "variables": variables}
         response = self.resource.resource_graphql(**payload)
