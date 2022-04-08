@@ -5,7 +5,8 @@ from graphene import Schema
 from silvaengine_utility import Utility
 from .resource.handlers import add_resource_handler, get_env_variables
 from .resource.schema import Query, type_class
-from .resource.models import BaseModel
+
+# from .resource.models import BaseModel
 
 __author__ = "bl"
 
@@ -43,14 +44,14 @@ class Resource(object):
         self.logger = logger
         self.setting = setting
 
-        BaseModel.Meta.aws_access_key_id = get_env_variables(
-            settings=setting,
-            variable_name="aws_access_key_id",
-        )
-        BaseModel.Meta.aws_secret_access_key = get_env_variables(
-            settings=setting,
-            variable_name="aws_secret_access_key",
-        )
+        # BaseModel.Meta.aws_access_key_id = get_env_variables(
+        #     settings=setting,
+        #     variable_name="aws_access_key_id",
+        # )
+        # BaseModel.Meta.aws_secret_access_key = get_env_variables(
+        #     settings=setting,
+        #     variable_name="aws_secret_access_key",
+        # )
 
     @staticmethod
     def add_resource(cloud_function_name, apply_to, packages):
