@@ -230,6 +230,10 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
                     if functions.get(key):
                         connection_functions[key] = functions[key]
 
+                for k, v in connection_functions.items():
+                    v.aws_lambda_arn = aws_lambda_arn
+                    connection_functions[k] = v
+
                 statements.append(
                     {
                         "statement": ConnectionsModel(
