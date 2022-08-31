@@ -2,23 +2,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 from silvaengine_utility import Utility
-from pynamodb.connection import Connection
-from pynamodb.transactions import TransactWrite
-from pynamodb.exceptions import TransactWriteError
 from datetime import datetime
 from dotenv import load_dotenv
-from importlib.util import find_spec
-from importlib import import_module
 from hashlib import md5
-from .models import (
+from silvaengine_resource.resource.models import (
     ResourceModel,
     FunctionsModel,
-    ConfigDataModel,
     ConnectionsModel,
     FunctionMap,
 )
-from .enumerations import SwitchStatus
-import boto3, os
+from silvaengine_resource.resource.enumerations import SwitchStatus
+import boto3, os, copy
 
 
 __author__ = "bl"
@@ -220,6 +214,7 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
             keys = connection_functions.keys()
 
             for connection in ConnectionsModel.query(apply_to):
+                cfs = copy.deepcopy(connection_functions)
                 functions = dict(
                     (str(item.function).strip().lower(), item)
                     for item in connection.functions
@@ -227,12 +222,18 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
                 )
 
                 for key in list(set(list(keys) + list(functions.keys()))):
-                    if functions.get(key):
-                        connection_functions[key] = functions[key]
+                    if functions.get(str(key).strip().lower()):
+                        cfs[str(key).strip().lower()] = functions[
+                            str(key).strip().lower()
+                        ]
 
-                for k, v in connection_functions.items():
+                for k, v in cfs.items():
                     v.aws_lambda_arn = aws_lambda_arn
-                    connection_functions[k] = v
+                    cfs[k] = v
+
+                for k, v in cfs.items():
+                    if k == "sync_data":
+                        print(k, ":::", v.setting, v.function, "\r\n")
 
                 statements.append(
                     {
@@ -240,7 +241,7 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
                             apply_to,
                             connection.api_key,
                             **{
-                                "functions": connection_functions.values(),
+                                "functions": cfs.values(),
                             },
                         ),
                     }
@@ -268,7 +269,6 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
                 #     transaction.save(item.get("statement"))
 
                 print("Completed:", item.get("statement"))
-
         print("Done!")
     except Exception as e:
         raise e
