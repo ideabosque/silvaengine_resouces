@@ -228,7 +228,7 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
                         ]
 
                 for k, v in cfs.items():
-                    v.aws_lambda_arn = aws_lambda_arn
+                    # v.aws_lambda_arn = aws_lambda_arn
                     cfs[k] = v
 
                 for k, v in cfs.items():
