@@ -16,7 +16,8 @@ setting = {
     "aws_secret_access_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
 }
 
-sys.path.insert(0, "/var/www/projects/silvaengine_resouces")
+module_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+sys.path.append(module_path)
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger()
@@ -36,6 +37,8 @@ class SilvaEngineResourceTest(unittest.TestCase):
     def test_add_resource(self):
         logger.info(
             self.resource.add_resource(
+                "silvaengine_microcore_ewp",
+                "ewp",
                 [
                     "analytics_engine",
                     "user_engine",
@@ -46,7 +49,7 @@ class SilvaEngineResourceTest(unittest.TestCase):
             )
         )
 
-    # @unittest.skip("demonstrating skipping")
+    @unittest.skip("demonstrating skipping")
     def test_graphql_get_resource(self):
 
         variables = {

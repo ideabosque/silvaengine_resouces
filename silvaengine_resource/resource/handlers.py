@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 from silvaengine_utility import Utility
-from datetime import datetime
 from dotenv import load_dotenv
 from hashlib import md5
 from silvaengine_resource.resource.models import (
@@ -12,7 +11,7 @@ from silvaengine_resource.resource.models import (
     FunctionMap,
 )
 from silvaengine_resource.resource.enumerations import SwitchStatus
-import boto3, os, copy
+import boto3, os, copy, datetime
 
 
 __author__ = "bl"
@@ -65,6 +64,7 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
         # Deploy area
         area = ResourceModel.Meta.aws_api_area
         # endpoint_id = ResourceModel.Meta.aws_endpoint_id
+        # print("AREA: ",area)
 
         # TODO: Get region / IAM Number from env.
         aws_lambda_arn = "arn:aws:lambda:{}:{}:function:{}".format(
@@ -72,7 +72,7 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
             identity.get("Account"),
             str(cloud_function_name).strip(),
         )
-        now = datetime.utcnow()
+        now = datetime.datetime.utcnow()
         mutation_actions = ["create", "update", "delete", "mutation"]
         connection_functions = {}
 
@@ -211,6 +211,7 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
 
         # 2.3 Add function setting to se-connections
         if len(connection_functions.values()) > 0:
+            # print("------------------")
             keys = connection_functions.keys()
 
             for connection in ConnectionsModel.query(apply_to):
@@ -227,13 +228,13 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
                             str(key).strip().lower()
                         ]
 
-                for k, v in cfs.items():
-                    # v.aws_lambda_arn = aws_lambda_arn
-                    cfs[k] = v
+                # for k, v in cfs.items():
+                #     # v.aws_lambda_arn = aws_lambda_arn
+                #     cfs[k] = v
 
-                for k, v in cfs.items():
-                    if k == "sync_data":
-                        print(k, ":::", v.setting, v.function, "\r\n")
+                
+                # for _, v in cfs.items():
+                #     print(">>>>> ARN: {}, FUNCTION: {}, SETTING: {}".format(v.aws_lambda_arn, v.function, v.setting))
 
                 statements.append(
                     {
@@ -258,7 +259,7 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
             for item in statements:
                 if not item.get("statement"):
                     continue
-
+ 
                 item.get("statement").save()
 
                 # if item.get("condition"):
