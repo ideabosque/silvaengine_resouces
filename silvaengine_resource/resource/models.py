@@ -28,7 +28,7 @@ class ApplyToResourceIdIndex(GlobalSecondaryIndex):
         index_name = "apply_to-resource_id-index"
 
     apply_to = UnicodeAttribute(hash_key=True)
-    resourceId = UnicodeAttribute(range_key=True)
+    resource_id = UnicodeAttribute(range_key=True)
 
 
 class BaseModel(Model):
