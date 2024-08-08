@@ -42,9 +42,9 @@ def resolve_resources(info, **kwargs):
                     )
 
     else:
-        results = ResourceModel.scan(
+        results = ResourceModel.apply_to_resource_id_index.query(
             limit=int(limit),
-            filter_condition=(ResourceModel.apply_to == info.context.get("channel")),
+            hash_key=str(info.context.get("channel")).strip(),
             last_evaluated_key=last_evaluated_key,
         )
 

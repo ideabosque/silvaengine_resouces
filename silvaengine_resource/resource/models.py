@@ -10,10 +10,25 @@ from pynamodb.attributes import (
     ListAttribute,
     BooleanAttribute,
 )
+from pynamodb.indexes import GlobalSecondaryIndex, AllProjection
 import os
 
 
 __author__ = "bl"
+
+class ApplyToResourceIdIndex(GlobalSecondaryIndex):
+    """
+    This class represents a local secondary index
+    """
+
+    class Meta:
+        billing_mode = "PAY_PER_REQUEST"
+        # All attributes are projected
+        projection = AllProjection()
+        index_name = "apply_to-resource_id-index"
+
+    apply_to = UnicodeAttribute(hash_key=True)
+    resourceId = UnicodeAttribute(range_key=True)
 
 
 class BaseModel(Model):
@@ -54,12 +69,13 @@ class ResourceModel(BaseModel):
     class Meta(BaseModel.Meta):
         table_name = "se-resources"
 
+    apply_to_resource_id_index = ApplyToResourceIdIndex()
+    apply_to = UnicodeAttribute()
     resource_id = UnicodeAttribute(hash_key=True)
     service = UnicodeAttribute(range_key=True)
     module_name = UnicodeAttribute()
     class_name = UnicodeAttribute()
     function = UnicodeAttribute()
-    apply_to = UnicodeAttribute()
     label = UnicodeAttribute()
     status = NumberAttribute()
     operations = ResourceOperationMap()
