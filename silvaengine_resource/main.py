@@ -54,7 +54,7 @@ class Resource(object):
         # )
 
     @staticmethod
-    def add_resource(cloud_function_name, apply_to,area, packages):
+    def add_resource(cloud_function_name, apply_to, area, packages):
         return add_resource_handler(
             str(cloud_function_name).strip(), str(apply_to).strip(),str(area).strip(), list(set(packages))
         )
