@@ -39,7 +39,7 @@ def _get_operations(payload, return_as_map=False) -> list:
     return operations
 
 
-def add_resource_handler(cloud_function_name, apply_to, packages):
+def add_resource_handler(cloud_function_name, apply_to, area, packages):
     try:
         if (
             not cloud_function_name
@@ -62,7 +62,7 @@ def add_resource_handler(cloud_function_name, apply_to, packages):
         statements = []
 
         # Deploy area
-        area = ResourceModel.Meta.aws_api_area
+        # area = ResourceModel.Meta.aws_api_area
         # endpoint_id = ResourceModel.Meta.aws_endpoint_id
         # print("AREA: ",area)
 
