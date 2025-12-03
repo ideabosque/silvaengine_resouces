@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from __future__ import print_function
+from typing import List, Any
 from graphene import ObjectType, String, Int, Schema, Field
 from silvaengine_utility import JSON
 from .types import ResourcesType
@@ -9,7 +9,7 @@ from .queries import resolve_resources
 __author__ = "bl"
 
 
-def type_class():
+def type_class() -> List[Any]:
     return [ResourcesType]
 
 
@@ -27,7 +27,7 @@ class Query(ObjectType):
 
 
 # Generate API documents.
-def graphql_schema_doc():
+def graphql_schema_doc() -> Any:
     from graphdoc import to_doc
 
     schema = Schema(

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from __future__ import print_function
+from typing import Dict, Any, List, Optional, Union
 from silvaengine_utility import Utility
 from dotenv import load_dotenv
 from hashlib import md5
@@ -17,7 +17,7 @@ import boto3, os, copy, datetime
 __author__ = "bl"
 
 
-def _get_operations(payload, return_as_map=False) -> list:
+def _get_operations(payload: Any, return_as_map: bool = False) -> list:
     operations = []
 
     if type(payload) is list and len(payload):
@@ -39,15 +39,26 @@ def _get_operations(payload, return_as_map=False) -> list:
     return operations
 
 
-def add_resource_handler(cloud_function_name, apply_to, area, packages):
+def add_resource_handler(
+    cloud_function_name: str, apply_to: str, area: str, packages: List[str], logger=None
+) -> None:
     try:
-        if (
-            not cloud_function_name
-            or not apply_to
-            or type(packages) is not list
-            or len(packages) < 1
-        ):
-            return
+        # Use default logger if not provided
+        if not logger:
+            import logging
+            logger = logging.getLogger(__name__)
+
+        # Validate input parameters
+        if not cloud_function_name:
+            raise ValueError("cloud_function_name is required")
+        if not apply_to:
+            raise ValueError("apply_to is required")
+        if type(packages) is not list:
+            raise TypeError("packages must be a list")
+        if len(packages) < 1:
+            raise ValueError("packages list must not be empty")
+        if not area:
+            raise ValueError("area is required")
 
         identity = boto3.client(
             "sts",
@@ -57,6 +68,7 @@ def add_resource_handler(cloud_function_name, apply_to, area, packages):
         ).get_caller_identity()
 
         if identity.get("Account") is None:
+            logger.error("Failed to get AWS account identity")
             return
 
         statements = []
@@ -211,7 +223,6 @@ def add_resource_handler(cloud_function_name, apply_to, area, packages):
 
         # 2.3 Add function setting to se-connections
         if len(connection_functions.values()) > 0:
-            # print("------------------")
             keys = connection_functions.keys()
 
             for connection in ConnectionsModel.query(apply_to):
@@ -232,7 +243,6 @@ def add_resource_handler(cloud_function_name, apply_to, area, packages):
                 #     # v.aws_lambda_arn = aws_lambda_arn
                 #     cfs[k] = v
 
-                
                 # for _, v in cfs.items():
                 #     print(">>>>> ARN: {}, FUNCTION: {}, SETTING: {}".format(v.aws_lambda_arn, v.function, v.setting))
 
@@ -250,29 +260,41 @@ def add_resource_handler(cloud_function_name, apply_to, area, packages):
 
         # Insert by batch
         if len(statements):
-            print("Start setting configuration information: ")
-            # @TODO: If statements total more than 25, should use batchWrite to replace.
-            # with TransactWrite(
-            #     connection=Connection(region=ResourceModel.Meta.region),
-            #     client_request_token=uuid.uuid1().hex,
-            # ) as transaction:
+            logger.info("Start setting configuration information: ")
+
+            # Group statements by model type for batch write
+            batch_items = {}
             for item in statements:
                 if not item.get("statement"):
                     continue
- 
-                item.get("statement").save()
 
-                # if item.get("condition"):
-                #     transaction.save(
-                #         item.get("statement"), condition=(item.get("condition"))
-                #     )
-                # else:
-                #     transaction.save(item.get("statement"))
+                model_instance = item.get("statement")
+                model_class = model_instance.__class__
 
-                print("Completed:", item.get("statement"))
-        print("Done!")
+                if model_class not in batch_items:
+                    batch_items[model_class] = []
+
+                batch_items[model_class].append(model_instance)
+
+            # Perform batch write for each model type
+            for model_class, instances in batch_items.items():
+                # Batch write in chunks of 25 items (DynamoDB limit)
+                for i in range(0, len(instances), 25):
+                    chunk = instances[i : i + 25]
+                    with model_class.batch_write() as batch:
+                        for instance in chunk:
+                            batch.save(instance)
+                            logger.info(f"Completed: {instance}")
+        logger.info("Done!")
+    except ValueError as e:
+        logger.error(f"Validation error: {str(e)}")
+        raise
+    except TypeError as e:
+        logger.error(f"Type error: {str(e)}")
+        raise
     except Exception as e:
-        raise e
+        logger.error(f"Unexpected error: {str(e)}", exc_info=True)
+        raise
 
 
 def get_env_variables(settings, variable_name):

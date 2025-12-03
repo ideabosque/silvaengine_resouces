@@ -1,0 +1,5 @@
+silvaengine_utility
+pynamodb>=5.0.0
+ graphene>=3.0.0
+dotenv>=1.0.0
+python-dateutil>=2.8.0

@@ -1,11 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from __future__ import print_function
-
 __author__ = "bl"
 
 import logging, sys, unittest, os
-from silvaengine_utility import Utility
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -16,7 +13,9 @@ setting = {
     "aws_secret_access_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
 }
 
-module_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+module_path = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+)
 sys.path.append(module_path)
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
@@ -39,6 +38,7 @@ class SilvaEngineResourceTest(unittest.TestCase):
             self.resource.add_resource(
                 "silvaengine_microcore_ewp",
                 "ewp",
+                "core",
                 [
                     "analytics_engine",
                     "user_engine",
@@ -49,13 +49,12 @@ class SilvaEngineResourceTest(unittest.TestCase):
             )
         )
 
-    @unittest.skip("demonstrating skipping")
+    # @unittest.skip("demonstrating skipping")
     def test_graphql_get_resource(self):
 
         variables = {
             "limit": 1000,
             "lastEvaluatedKey": {},
-            # "resourceId": "5efb66cd78a2d3e22a545eca272871de",
         }
         query = """
             query resources($limit: Int!, $lastEvaluatedKey: JSON, $resourceId: String) {

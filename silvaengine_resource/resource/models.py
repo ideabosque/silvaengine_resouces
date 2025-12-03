@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from __future__ import print_function
+from typing import Optional, Any
 from pynamodb.models import Model
 from pynamodb.attributes import (
     UnicodeAttribute,
@@ -19,24 +19,40 @@ __author__ = "bl"
 class BaseModel(Model):
     class Meta:
         billing_mode = "PAY_PER_REQUEST"
-        region = os.getenv("REGIONNAME", "us-east-1")
-        aws_access_key_id = os.getenv("aws_access_key_id")
-        aws_secret_access_key = os.getenv("aws_secret_access_key")
+        # Support for IAM roles by not requiring explicit credentials
+        region = os.getenv(
+            "REGIONNAME", os.getenv("AWS_REGION", os.getenv("region_name", "us-east-1"))
+        )
+        aws_access_key_id = os.getenv(
+            "aws_access_key_id", os.getenv("AWS_ACCESS_KEY_ID")
+        )
+        aws_secret_access_key = os.getenv(
+            "aws_secret_access_key", os.getenv("AWS_SECRET_ACCESS_KEY")
+        )
         aws_api_area = os.getenv("aws_api_area", "core")
         aws_endpoint_id = os.getenv("aws_endpoint_id", "api")
 
+        # Load from .env file if credentials not found
         if region is None or aws_access_key_id is None or aws_secret_access_key is None:
             from dotenv import load_dotenv
 
-            if load_dotenv():
-                if region is None:
-                    region = os.getenv("region_name")
+            load_dotenv()
 
-                if aws_access_key_id is None:
-                    aws_access_key_id = os.getenv("aws_access_key_id")
+            if region is None:
+                region = os.getenv(
+                    "REGIONNAME",
+                    os.getenv("AWS_REGION", os.getenv("region_name", "us-east-1")),
+                )
+            if aws_access_key_id is None:
+                aws_access_key_id = os.getenv(
+                    "aws_access_key_id", os.getenv("AWS_ACCESS_KEY_ID")
+                )
+            if aws_secret_access_key is None:
+                aws_secret_access_key = os.getenv(
+                    "aws_secret_access_key", os.getenv("AWS_SECRET_ACCESS_KEY")
+                )
 
-                if aws_secret_access_key is None:
-                    aws_secret_access_key = os.getenv("aws_secret_access_key")
+        # Note: If credentials are still None, PynamoDB will use IAM roles or default credentials chain
 
 
 class ResourceOperationItemMap(MapAttribute):

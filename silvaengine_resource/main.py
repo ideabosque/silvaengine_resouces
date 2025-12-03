@@ -1,18 +1,17 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from __future__ import print_function
+from typing import Dict, Any, List, Optional, Union
 from graphene import Schema
 from silvaengine_utility import Utility
-from .resource.handlers import add_resource_handler, get_env_variables
-from .resource.schema import Query, type_class
 
-# from .resource.models import BaseModel
+from .resource.handlers import add_resource_handler
+from .resource.schema import Query, type_class
 
 __author__ = "bl"
 
 
 # Hook function applied to deployment
-def deploy() -> list:
+def deploy() -> List[Dict[str, Any]]:
     return [
         {
             "service": "resources",
@@ -40,31 +39,29 @@ def deploy() -> list:
 
 
 class Resource(object):
-    def __init__(self, logger, **setting):
+    def __init__(self, logger: Any, **setting: Dict[str, Any]):
         self.logger = logger
         self.setting = setting
 
-        # BaseModel.Meta.aws_access_key_id = get_env_variables(
-        #     settings=setting,
-        #     variable_name="aws_access_key_id",
-        # )
-        # BaseModel.Meta.aws_secret_access_key = get_env_variables(
-        #     settings=setting,
-        #     variable_name="aws_secret_access_key",
-        # )
-
-    @staticmethod
-    def add_resource(cloud_function_name, apply_to, area, packages):
+    def add_resource(self, cloud_function_name: str, apply_to: str, area: str, packages: List[str]) -> Any:
         return add_resource_handler(
-            str(cloud_function_name).strip(), str(apply_to).strip(), str(area).strip(), list(set(packages))
+            str(cloud_function_name).strip(),
+            str(apply_to).strip(),
+            str(area).strip(),
+            list(set(packages)),
+            logger=self.logger,
         )
 
-    def resource_graphql(self, **params):
+    def resource_graphql(self, **params: Dict[str, Any]) -> str:
         try:
             channel = params.get("endpoint_id", "api")
 
             if not channel:
-                raise Exception("Unrecognized request origin", 401)
+                response = {
+                    "errors": "Unrecognized request origin.",
+                    "status_code": 401,
+                }
+                return Utility.json_dumps(response)
 
             context = {
                 "logger": self.logger,
@@ -90,22 +87,35 @@ class Resource(object):
             if not execution_result:
                 response = {
                     "errors": "Invalid execution result.",
+                    "status_code": 500,
                 }
             elif execution_result.errors:
                 response = {
                     "errors": [
                         Utility.format_error(e) for e in execution_result.errors
                     ],
+                    "status_code": 400,
                 }
             elif execution_result.invalid:
-                response = execution_result
+                response = {
+                    "errors": "Invalid GraphQL query.",
+                    "status_code": 400,
+                }
             elif execution_result.data:
                 response = {"data": execution_result.data, "status_code": 200}
             else:
                 response = {
                     "errors": "Uncaught execution error.",
+                    "status_code": 500,
                 }
 
             return Utility.json_dumps(response)
         except Exception as e:
-            raise e
+            # Log the full error for debugging
+            self.logger.error(f"GraphQL execution error: {str(e)}", exc_info=True)
+            # Return a generic error message to the client
+            response = {
+                "errors": "Internal server error.",
+                "status_code": 500,
+            }
+            return Utility.json_dumps(response)
