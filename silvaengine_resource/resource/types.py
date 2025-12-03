@@ -10,7 +10,7 @@ from graphene import (
     Field,
     Boolean,
 )
-from silvaengine_utility import JSON
+# from silvaengine_utility import JSON
 
 
 __author__ = "bl"
@@ -49,7 +49,7 @@ class PageInputType(InputObjectType):
 
 class ResourcesType(ObjectType):
     items = List(ResourceType)
-    last_evaluated_key = JSON()
+    # last_evaluated_key = JSON()
 
 
 class ResourceInputType(InputObjectType):
