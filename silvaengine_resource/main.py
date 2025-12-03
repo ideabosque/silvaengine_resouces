@@ -43,13 +43,13 @@ class Resource(object):
         self.logger = logger
         self.setting = setting
 
-    def add_resource(self, cloud_function_name: str, apply_to: str, area: str, packages: List) -> Any:
+    @staticmethod
+    def add_resource(cloud_function_name: str, apply_to: str, area: str, packages: List) -> Any:
         return add_resource_handler(
             str(cloud_function_name).strip(),
             str(apply_to).strip(),
             str(area).strip(),
             list(set(packages)),
-            logger=self.logger,
         )
 
     def resource_graphql(self, **params: Dict[str, Any]) -> str:
