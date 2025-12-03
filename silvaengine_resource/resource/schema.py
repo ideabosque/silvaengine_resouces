@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import List, Any
 from graphene import ObjectType, String, Int, Schema, Field
-from silvaengine_utility import JSON
+# from silvaengine_utility import JSON
 from .types import ResourcesType
 from .queries import resolve_resources
 
@@ -18,7 +18,7 @@ class Query(ObjectType):
     resources = Field(
         ResourcesType,
         limit=Int(),
-        last_evaluated_key=JSON(),
+        # last_evaluated_key=JSON(),
         resource_id=String(),
     )
 
