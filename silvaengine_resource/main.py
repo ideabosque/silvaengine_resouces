@@ -43,7 +43,7 @@ class Resource(object):
         self.logger = logger
         self.setting = setting
 
-    def add_resource(self, cloud_function_name: str, apply_to: str, area: str, packages: List[str]) -> Any:
+    def add_resource(self, cloud_function_name: str, apply_to: str, area: str, packages: List) -> Any:
         return add_resource_handler(
             str(cloud_function_name).strip(),
             str(apply_to).strip(),
