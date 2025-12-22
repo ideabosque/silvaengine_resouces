@@ -196,7 +196,8 @@ def add_resource_handler(
                                         ),
                                         "methods": support_methods,
                                         "module_name": str(package).strip(),
-                                        "setting": config.get("settings", package),
+                                        # "setting": config.get("settings", package),
+                                        "setting": f"beta_core_{str(apply_to).strip().lower()}" if apply_to else config.get("settings", package),
                                         "auth_required": bool(
                                             config.get("is_auth_required", False)
                                         ),
@@ -238,13 +239,6 @@ def add_resource_handler(
                         cfs[str(key).strip().lower()] = functions[
                             str(key).strip().lower()
                         ]
-
-                # for k, v in cfs.items():
-                #     # v.aws_lambda_arn = aws_lambda_arn
-                #     cfs[k] = v
-
-                # for _, v in cfs.items():
-                #     print(">>>>> ARN: {}, FUNCTION: {}, SETTING: {}".format(v.aws_lambda_arn, v.function, v.setting))
 
                 statements.append(
                     {
