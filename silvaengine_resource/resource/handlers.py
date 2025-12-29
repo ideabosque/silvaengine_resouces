@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional, Union
 
 import boto3
 from dotenv import load_dotenv
-from silvaengine_utility import Utility
+from silvaengine_utility import Invoker, Utility
 
 from silvaengine_resource.resource.enumerations import SwitchStatus
 from silvaengine_resource.resource.models import (
@@ -96,7 +96,7 @@ def add_resource_handler(
         # Insert resource / function / config data.
         for package in packages:
             # 1. Load module by dynamic
-            fn_deploy = Utility.import_dynamically(
+            fn_deploy = Invoker.import_dynamically(
                 module_name=package, function_name="deploy"
             )
 
