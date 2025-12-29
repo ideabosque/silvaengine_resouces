@@ -187,13 +187,6 @@ def add_resource_handler(
                     for action in mutation_actions:
                         mutations += _get_operations(payload=config.get(action))
 
-                    print("-" * 120)
-                    print(
-                        f"beta_core_{str(apply_to).strip().lower()}"
-                        if apply_to
-                        else config.get("settings", package)
-                    )
-                    print("-" * 120)
                     statements.append(
                         {
                             "statement": FunctionsModel(
