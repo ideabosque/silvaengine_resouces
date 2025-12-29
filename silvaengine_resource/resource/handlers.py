@@ -1,18 +1,22 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from typing import Dict, Any, List, Optional, Union
-from silvaengine_utility import Utility
-from dotenv import load_dotenv
+import copy
+import datetime
+import os
 from hashlib import md5
+from typing import Any, Dict, List, Optional, Union
+
+import boto3
+from dotenv import load_dotenv
+from silvaengine_utility import Utility
+
+from silvaengine_resource.resource.enumerations import SwitchStatus
 from silvaengine_resource.resource.models import (
-    ResourceModel,
-    FunctionsModel,
     ConnectionsModel,
     FunctionMap,
+    FunctionsModel,
+    ResourceModel,
 )
-from silvaengine_resource.resource.enumerations import SwitchStatus
-import boto3, os, copy, datetime
-
 
 __author__ = "bl"
 
@@ -46,6 +50,7 @@ def add_resource_handler(
         # Use default logger if not provided
         if not logger:
             import logging
+
             logger = logging.getLogger(__name__)
 
         # Validate input parameters
@@ -182,6 +187,13 @@ def add_resource_handler(
                     for action in mutation_actions:
                         mutations += _get_operations(payload=config.get(action))
 
+                    print("-" * 120)
+                    print(
+                        f"beta_core_{str(apply_to).strip().lower()}"
+                        if apply_to
+                        else config.get("settings", package)
+                    )
+                    print("-" * 120)
                     statements.append(
                         {
                             "statement": FunctionsModel(
@@ -197,7 +209,9 @@ def add_resource_handler(
                                         "methods": support_methods,
                                         "module_name": str(package).strip(),
                                         # "setting": config.get("settings", package),
-                                        "setting": f"beta_core_{str(apply_to).strip().lower()}" if apply_to else config.get("settings", package),
+                                        "setting": f"beta_core_{str(apply_to).strip().lower()}"
+                                        if apply_to
+                                        else config.get("settings", package),
                                         "auth_required": bool(
                                             config.get("is_auth_required", False)
                                         ),
