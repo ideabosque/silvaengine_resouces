@@ -96,7 +96,7 @@ def add_resource_handler(
         # Insert resource / function / config data.
         for package in packages:
             # 1. Load module by dynamic
-            fn_deploy = Invoker.import_dynamically(
+            fn_deploy = Invoker.resolve_proxied_callable(
                 module_name=package, function_name="deploy"
             )
 
