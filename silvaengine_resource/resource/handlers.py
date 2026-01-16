@@ -8,7 +8,6 @@ from typing import Any, Dict, List, Optional, Union
 
 import boto3
 from dotenv import load_dotenv
-from silvaengine_utility import Invoker, Utility
 
 from silvaengine_resource.resource.enumerations import SwitchStatus
 from silvaengine_resource.resource.models import (
@@ -17,6 +16,7 @@ from silvaengine_resource.resource.models import (
     FunctionsModel,
     ResourceModel,
 )
+from silvaengine_utility import Invoker, Utility
 
 __author__ = "bl"
 
@@ -97,7 +97,8 @@ def add_resource_handler(
         for package in packages:
             # 1. Load module by dynamic
             fn_deploy = Invoker.resolve_proxied_callable(
-                module_name=package, function_name="deploy"
+                module_name=package,
+                function_name="deploy",
             )
 
             if not callable(fn_deploy):

@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from typing import Dict, Any, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
+
 from graphene import Schema
-from silvaengine_utility import Utility
+from silvaengine_utility import Serializer, Utility
 
 from .resource.handlers import add_resource_handler
 from .resource.schema import Query, type_class
@@ -44,7 +45,9 @@ class Resource(object):
         self.setting = setting
 
     @staticmethod
-    def add_resource(cloud_function_name: str, apply_to: str, area: str, packages: List) -> Any:
+    def add_resource(
+        cloud_function_name: str, apply_to: str, area: str, packages: List
+    ) -> Any:
         return add_resource_handler(
             str(cloud_function_name).strip(),
             str(apply_to).strip(),
@@ -61,7 +64,7 @@ class Resource(object):
                     "errors": "Unrecognized request origin.",
                     "status_code": 401,
                 }
-                return Utility.json_dumps(response)
+                return Serializer.json_dumps(response)
 
             context = {
                 "logger": self.logger,
@@ -78,7 +81,7 @@ class Resource(object):
             }
 
             if not operations:
-                return Utility.json_dumps(response)
+                return Serializer.json_dumps(response)
 
             execution_result = schema.execute(
                 operations, context_value=context, variable_values=variables
@@ -109,7 +112,7 @@ class Resource(object):
                     "status_code": 500,
                 }
 
-            return Utility.json_dumps(response)
+            return Serializer.json_dumps(response)
         except Exception as e:
             # Log the full error for debugging
             self.logger.error(f"GraphQL execution error: {str(e)}", exc_info=True)
@@ -118,4 +121,4 @@ class Resource(object):
                 "errors": "Internal server error.",
                 "status_code": 500,
             }
-            return Utility.json_dumps(response)
+            return Serializer.json_dumps(response)
