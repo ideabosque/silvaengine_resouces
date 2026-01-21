@@ -1,17 +1,17 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from graphene import (
-    ObjectType,
-    InputObjectType,
-    String,
+    Boolean,
     DateTime,
+    Field,
+    InputObjectType,
     Int,
     List,
-    Field,
-    Boolean,
+    ObjectType,
+    String,
 )
-# from silvaengine_utility import JSON
 
+# from silvaengine_utility import JSONCamelCase
 
 __author__ = "bl"
 

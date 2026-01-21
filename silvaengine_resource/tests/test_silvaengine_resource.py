@@ -2,7 +2,11 @@
 # -*- coding: utf-8 -*-
 __author__ = "bl"
 
-import logging, sys, unittest, os
+import logging
+import os
+import sys
+import unittest
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -45,19 +49,18 @@ class SilvaEngineResourceTest(unittest.TestCase):
                     "shipping_quote_engine",
                     "seller_engine",
                     "factory_engine",
-                ]
+                ],
             )
         )
 
     # @unittest.skip("demonstrating skipping")
     def test_graphql_get_resource(self):
-
         variables = {
             "limit": 1000,
             "lastEvaluatedKey": {},
         }
         query = """
-            query resources($limit: Int!, $lastEvaluatedKey: JSON, $resourceId: String) {
+            query resources($limit: Int!, $lastEvaluatedKey: JSONCamelCase, $resourceId: String) {
                 resources(limit: $limit, lastEvaluatedKey: $lastEvaluatedKey, resourceId: $resourceId) {
                     items {
                         resourceId

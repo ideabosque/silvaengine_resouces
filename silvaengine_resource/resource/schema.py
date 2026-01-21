@@ -1,10 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from typing import List, Any
-from graphene import ObjectType, String, Int, Schema, Field
-# from silvaengine_utility import JSON
-from .types import ResourcesType
+from typing import Any, List
+
+from graphene import Field, Int, ObjectType, Schema, String
+from silvaengine_utility import JSONCamelCase
+
 from .queries import resolve_resources
+from .types import ResourcesType
 
 __author__ = "bl"
 
